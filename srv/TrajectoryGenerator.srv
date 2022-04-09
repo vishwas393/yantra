@@ -1,3 +1,4 @@
-yantra/JointValues Q
+yantra/JointValues[] Q
+float64[] T
 ---
-yantra/TrajCoefficient coeff
+yantra/TrajCoefficient[] coeff

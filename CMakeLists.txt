@@ -59,6 +59,7 @@ add_message_files(
 add_service_files(
   FILES
   InverseKinematics.srv
+  TrajectoryGenerator.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -130,6 +131,9 @@ add_executable(main_node src/main_node.cpp)
 add_dependencies(main_node ${${PROJECT_NAME}_EXPORTED_TARGET} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(main_node ${catkin_LIBRARIES})
 
+add_executable(trajectory_generator_service src/trajectory_generator_service.cpp)
+add_dependencies(trajectory_generator_service ${${PROJECT_NAME}_EXPORTED_TARGET} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(trajectory_generator_service ${catkin_LIBRARIES})
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -173,7 +177,7 @@ catkin_install_python(PROGRAMS
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-install(TARGETS main_node
+install(TARGETS main_node trajectory_generator_service
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
