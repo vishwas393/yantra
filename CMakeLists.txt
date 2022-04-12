@@ -52,7 +52,8 @@ add_message_files(
   FILES
   JointValues.msg
   Position.msg
-  TrajCoefficient.msg
+  PathCoefficient_1d.msg
+  PathCoefficient_2d.msg
 )
 
 ## Generate services in the 'srv' folder

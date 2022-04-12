@@ -1,4 +1,4 @@
 yantra/JointValues[] Q
 float64[] T
 ---
-yantra/TrajCoefficient[] coeff
+yantra/PathCoefficient_2d[] a_qi

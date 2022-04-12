@@ -1,6 +1,7 @@
 #include "ros/ros.h"
 #include "yantra/Position.h"
-#include "yantra/TrajCoefficient.h"
+#include "yantra/PathCoefficient_1d.h"
+#include "yantra/PathCoefficient_2d.h"
 #include "yantra/InverseKinematics.h"
 #include "yantra/TrajectoryGenerator.h"
 #include <math.h>
@@ -91,9 +92,14 @@ int trajectory_generator(ros::ServiceClient *cl, yantra::JointValues *q, double 
 	if(cl->call(srv))
 	{
 		for(int i=0; i<5; i++) {
-			for(int j=0; j<4; j++) {
-				*(a+(4*i)+j) = srv.response.coeff[i].a[j];
+			std::cout << "Trajectory Coefficient for joint " << i << ":" << std::endl;
+			for(int j=0; j<5; j++) {
+				for(int k=0; k<4; k++) {
+					std::cout << srv.response.a_qi[i].a_pi[j].a[k] << " | ";
+				}
+				std::cout << std::endl;
 			}
+			std::cout<<std::endl;
 		}
 	}
 	else
@@ -156,11 +162,4 @@ int main(int argc, char** argv)
 	int err = trajectory_generator(&client_TG, &t[0], &a[0][0]);
 
 	std::cout << "Printing the values of Trajectory coefficients" << std::endl;
-	for(int i=0; i<5; i++) {
-		std::cout << "[";
-		for(int j=0; j<4; j++) {
-			std::cout << a[i][j] << " , ";
-		}
-		std::cout << "];" << std::endl;
-	}
 }
