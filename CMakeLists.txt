@@ -12,6 +12,8 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   message_generation
+  urdf
+  gazebo_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -74,6 +76,7 @@ add_service_files(
 generate_messages(
   DEPENDENCIES
   std_msgs  # Or other packages containing msgs
+  gazebo_msgs
 )
 
 ################################################
@@ -199,7 +202,7 @@ install(TARGETS main_node trajectory_generator_service
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 install(DIRECTORY
-  launch
+  launch urdf
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 

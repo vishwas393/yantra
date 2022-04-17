@@ -1,0 +1,167 @@
+<?xml version="1.0"?>
+<robot name="yantra_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<xacro:property name="m0" value="10.8791766"/>
+	<xacro:property name="m1" value="0.9647109"/>
+	<xacro:property name="m2" value="2.0600634"/>
+	<xacro:property name="m3" value="1.246083"/>
+	<xacro:property name="m4" value="1.6781958"/>
+	<xacro:property name="m51" value="1.1254986"/>
+	<xacro:property name="m52" value="0.83315028"/>
+
+	<xacro:property name="r0" value="0.073"/>
+	<xacro:property name="r1" value="0.028"/>
+	<xacro:property name="r2" value="0.028"/>
+	<xacro:property name="r3" value="0.028"/>
+	<xacro:property name="r4" value="0.028"/>
+	<xacro:property name="r51" value="0.025"/>
+	<xacro:property name="r52" value="0.025"/>
+
+	<xacro:property name="h0" value="0.187"/>
+	<xacro:property name="h1" value="0.096"/>
+	<xacro:property name="h2" value="0.205"/>
+	<xacro:property name="h3" value="0.124"/>
+	<xacro:property name="h4" value="0.167"/>
+	<xacro:property name="h51" value="0.112"/>
+	<xacro:property name="h52" value="0.104"/>
+
+	<material name="red_trans">
+		<color rgba="1 0 0 0.5"/>
+	</material>
+
+
+	<xacro:macro name="link" params="i x y z r p m rad ht rot_axis">
+		<link name="link_${i}">
+			<visual>
+				<origin rpy="${r} ${p} 0" xyz="${x} ${y} ${z}"/>
+				<geometry>
+					<cylinder length="${ht}" radius="${rad}"/>
+				</geometry>
+				<material name="red_trans"/>
+			</visual>
+			<collision>
+				<origin rpy="${r} ${p} 0" xyz="${x} ${y} ${z}"/>
+				<geometry>
+					<cylinder length="${ht}" radius="${rad}"/>
+				</geometry>
+			</collision>
+			<inertial>
+				<origin rpy="${r} ${p} 0" xyz="${x} ${y} ${z}"/>
+				<mass value="${m}"/>
+
+				<xacro:if value="${rot_axis == 'x'}">
+					<inertia ixx="${m*ht*ht/3}" ixy="0" ixz="0" iyy="0" iyz="0" izz="${m*ht*ht/3}"/>
+				</xacro:if>
+				<xacro:if value="${rot_axis == 'z'}">
+					<inertia ixx="${m*(3*rad*rad + ht*ht)/12}" ixy="0" ixz="0" iyy="${m*(3*rad*rad + ht*ht)/12}" iyz="0" izz="${m*rad*rad/2}"/>
+				</xacro:if>
+				<xacro:if value="${rot_axis == 'n'}">
+					<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+				</xacro:if>
+			</inertial>
+		</link>
+		<gazebo reference="link_${i}">
+			<!--mu1 value="200.0"/>
+			<mu2 value="100.0"/>
+			<kp value="100000.0"/>
+			<kd value="1"/-->
+			<material>Gazebo/BlackTransparent</material>
+		</gazebo>
+	</xacro:macro>
+
+
+
+
+
+	<xacro:macro name="link_joints" params="plink clink jtype x y z rx ry rz rr pp yy">
+		<xacro:if value="${jtype == 'f'}">
+		<joint name="joint_${plink}_${clink}" type="fixed">
+			<parent link="link_${plink}"/>
+			<child link="link_${clink}"/>
+			<origin xyz="${x} ${y} ${z}" rpy="${rr} ${pp} ${yy}"/>
+		</joint>
+		</xacro:if>
+		
+		<xacro:if value="${jtype == 'r'}">
+		<joint name="joint_${plink}_${clink}" type="revolute">
+			<parent link="link_${plink}"/>
+			<child link="link_${clink}"/>
+			<origin xyz="${x} ${y} ${z}" rpy="${rr} ${pp} ${yy}"/>
+			<axis xyz="${rx} ${ry} ${rz}"/>
+			<limit effort="1" upper="3.124" lower="-3.124" velocity="2.094"/>
+		</joint>
+		</xacro:if>
+	</xacro:macro>
+
+
+
+
+
+	<xacro:macro name="joint_transmission" params="i j">
+		<transmission name="transmission_${i}_${j}">
+			<type>transmission_interface/SimpleTransmission</type>
+			<actuator name="actuator_${i}_${j}">
+				<mechanicalReduction>1</mechanicalReduction>
+				<hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+			</actuator>
+			<joint name="link_${i}_${j}">
+				<hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+			</joint>
+		</transmission>
+	</xacro:macro>
+
+
+
+
+
+	<!--link name="link_0">
+		<visual>
+			<origin rpy="0 0 0" xyz="0 0 ${h0/2}"/>
+			<geometry>
+				<cylinder length="${h0}" radius="${r0}"/>
+			</geometry>
+			<material name="red_trans"/>
+		</visual>
+		<collision>
+			<origin rpy="0 0 0" xyz="0 0 ${h0/2}"/>
+			<geometry>
+				<cylinder length="${h0}" radius="${r0}"/>
+			</geometry>
+		</collision>
+	</link>
+	<gazebo reference="link_0">
+		<material>Gazebo/BlackTransparent</material>
+	</gazebo-->
+
+
+
+
+	<xacro:link i="0" r="0" p="0" x="0" y="0" z="${h0/2}" m="${m0}" rad="${r0}" ht="${h0}" rot_axis="z"/>
+	<xacro:link i="1" r="0" p="0" x="0" y="0" z="${h1/2}" m="${m1}" rad="${r1}" ht="${h1}" rot_axis="z"/>
+	<xacro:link i="2" r="0" p="0" x="0" y="0" z="${h2/2}" m="${m2}" rad="${r2}" ht="${h2}" rot_axis="x"/>
+	<xacro:link i="3" r="0" p="0" x="0" y="0" z="${h3/2}" m="${m3}" rad="${r3}" ht="${h3}" rot_axis="x"/>
+	<xacro:link i="4" r="0" p="0" x="0" y="0" z="${h4/2}" m="${m4}" rad="${r4}" ht="${h4}" rot_axis="z"/>
+	<xacro:link i="51" r="0" p="0" x="0" y="0" z="${h51/2}" m="${m51}" rad="${r51}" ht="${h51}" rot_axis="x"/>
+	<xacro:link i="52" r="0" p="${pi/2}" x="${h52/2 - r51}" y="0" z="0" m="${m52}" rad="${r52}" ht="${h52}" rot_axis="n"/>
+
+
+	<xacro:link_joints plink="0" clink="1" x="0" y="0" z="${h0}" rr="0" pp="0" yy="0" jtype="r" rx="0" ry="0" rz="1"/>
+	<xacro:link_joints plink="1" clink="2" x="0" y="0" z="${h1}" rr="0" pp="0" yy="0" jtype="r" rx="0" ry="1" rz="0"/>
+	<xacro:link_joints plink="2" clink="3" x="0" y="0" z="${h2}" rr="0" pp="0" yy="0" jtype="r" rx="0" ry="1" rz="0"/>
+	<xacro:link_joints plink="3" clink="4" x="0" y="0" z="${h3}" rr="0" pp="0" yy="0" jtype="r" rx="0" ry="0" rz="1"/>
+	<xacro:link_joints plink="4" clink="51" x="0" y="0" z="${h4}" rr="0" pp="0" yy="0" jtype="r" rx="0" ry="1" rz="0"/>
+	<xacro:link_joints plink="51" clink="52" x="0" y="0" z="${h51}" rr="0" pp="0" yy="0" jtype="f" rx="0" ry="0" rz="0"/>
+
+	<xacro:joint_transmission i="0" j="1"/>
+	<xacro:joint_transmission i="1" j="2"/>
+	<xacro:joint_transmission i="2" j="3"/>
+	<xacro:joint_transmission i="3" j="4"/>
+	<xacro:joint_transmission i="4" j="51"/>
+
+
+	<gazebo>
+		<plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+			<robotNamespace>/</robotNamespace>
+		</plugin>
+	</gazebo>
+</robot>
