@@ -1,0 +1,55 @@
+/yantra:
+        joint_state_controller:
+                type: joint_state_controller/JointStateController
+                publish_rate: 50
+
+        gazebo_ros_control/pid_gains:
+                joint_0_1: 
+                        p: 100.0
+                        i: 100.0
+                        d: 500.0
+
+                joint_1_2: {p: 100.0, i: 100.0, d: 500.0}
+                joint_2_3: {p: 100.0, i: 100.0, d: 500.0}
+                joint_3_4: {p: 100.0, i: 100.0, d: 500.0}
+                joint_4_51: {p: 100.0, i: 100.0, d: 500.0}
+        arm:
+                type: position_controllers/JointPositionController
+                joints:
+                        - joint_0_1
+                        - joint_1_2
+                        - joint_2_3
+                        - joint_3_4
+                        - joint_4_51
+
+                state_publish_rate: 25
+        
+
+                
+                joint_limits:
+                        joint_0_1:
+                                has_velocity_limits: true
+                                max_velocity: 2.094
+                                has_acceleration_limits: false
+                                max_acceleration: 0
+                        joint_1_2:
+                                has_velocity_limits: true
+                                max_velocity: 2.094
+                                has_acceleration_limits: false
+                                max_acceleration: 0
+                        joint_2_3:
+                                has_velocity_limits: true
+                                max_velocity: 2.094
+                                has_acceleration_limits: false
+                                max_acceleration: 0
+                        joint_3_4:
+                                has_velocity_limits: true
+                                max_velocity: 2.094
+                                has_acceleration_limits: false
+                                max_acceleration: 0
+                        joint_4_51:
+                                has_velocity_limits: true
+                                max_velocity: 2.094
+                                has_acceleration_limits: false
+                                max_acceleration: 0
+

@@ -61,10 +61,10 @@
 			</inertial>
 		</link>
 		<gazebo reference="link_${i}">
-			<!--mu1 value="200.0"/>
-			<mu2 value="100.0"/>
-			<kp value="100000.0"/>
-			<kd value="1"/-->
+			<mu1 value="30.0"/>
+			<mu2 value="30.0"/>
+			<kp value="1000000.0"/>
+			<kd value="100.0"/>
 			<material>Gazebo/BlackTransparent</material>
 		</gazebo>
 	</xacro:macro>
@@ -102,10 +102,10 @@
 			<type>transmission_interface/SimpleTransmission</type>
 			<actuator name="actuator_${i}_${j}">
 				<mechanicalReduction>1</mechanicalReduction>
-				<hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+				<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
 			</actuator>
-			<joint name="link_${i}_${j}">
-				<hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+			<joint name="joint_${i}_${j}">
+				<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
 			</joint>
 		</transmission>
 	</xacro:macro>
@@ -133,6 +133,11 @@
 		<material>Gazebo/BlackTransparent</material>
 	</gazebo-->
 
+	<link name="world"/>
+	<joint name="world_link_0" type="fixed">
+		<parent link="world"/>
+		<child link="link_0"/>
+	</joint>
 
 
 
@@ -161,7 +166,7 @@
 
 	<gazebo>
 		<plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
-			<robotNamespace>/</robotNamespace>
+			<robotNamespace>/yantra</robotNamespace>
 		</plugin>
 	</gazebo>
 </robot>
