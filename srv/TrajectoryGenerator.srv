@@ -1,4 +1,4 @@
 yantra/JointValues[] Q
-float64[] T
+float64[] T		# time for each waypoint
 ---
 yantra/PathCoefficient_2d[] a_qi

@@ -5,6 +5,7 @@
 #include "yantra/InverseKinematics.h"
 #include "yantra/TrajectoryGenerator.h"
 #include <math.h>
+#include <vector>
 
 int passing_points = 4;
 
