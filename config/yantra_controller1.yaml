@@ -1,0 +1,52 @@
+/yantra:
+        gazebo_ros_control:
+                pid_gains:
+                        joint_0_1:
+                                p: 100.0
+                                i: 100.0
+                                d: 500.0
+                        joint_1_2:
+                                p: 100.0
+                                i: 100.0
+                                d: 200.0
+                        joint_2_3:
+                                p: 100.0
+                                i: 50.0
+                                d: 100.0
+                        joint_3_4:
+                                p: 100.0
+                                i: 50.0
+                                d: 70.0
+                        joint_4_51:
+                                p: 100.0
+                                i: 50.0
+                                d: 70.0
+
+        joint_state_controller:
+                type: joint_state_controller/JointStateController
+                publish_rate: 50
+
+        joint_0_1_controller:
+                type: position_controllers/JointPositionController
+                joint: joint_0_1
+                pid: {p: 100.0, i: 100.0, d: 500.0}
+
+        joint_1_2_controller:
+                type: position_controllers/JointPositionController
+                joint: joint_1_2
+                pid: {p: 100, i: 100, d: 2000}
+
+        joint_2_3_controller:
+                type: position_controllers/JointPositionController
+                joint: joint_2_3
+                pid: {p: 100, i: 50, d: 1000}
+
+        joint_3_4_controller:
+                type: position_controllers/JointPositionController
+                joint: joint_3_4
+                pid: {p: 100, i: 50, d: 70}
+
+        joint_4_51_controller:
+                type: position_controllers/JointPositionController
+                joint: joint_4_51
+                pid: {p: 100, i: 50, d: 70}

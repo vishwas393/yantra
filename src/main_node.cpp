@@ -4,11 +4,14 @@
 #include "yantra/PathCoefficient_2d.h"
 #include "yantra/InverseKinematics.h"
 #include "yantra/TrajectoryGenerator.h"
+#include "std_msgs/Float64MultiArray.h"
 #include <math.h>
 #include <vector>
 
 int passing_points = 4;
 
+typedef std::vector<std::vector<double>> array2d;
+typedef std::vector<std::vector<std::vector<double>>> array3d;
 
 yantra::JointValues make_JointValues(double *q_val, double *q_velocity, double *q_accel)
 {
@@ -72,12 +75,10 @@ int apply_IK(ros::ServiceClient *cl, double *pos, double *q_init, double *q)
 
 
 
-int trajectory_generator(ros::ServiceClient *cl, yantra::JointValues *q, double *a)
+int trajectory_generator(ros::ServiceClient *cl, yantra::JointValues *q, array3d* a)
 {
 	yantra::TrajectoryGenerator srv;
-	//std::vector<double> tmp (5,0);
-	//std::vector<double> tmp1 (5,0);
-	//std::vector<double> tmp2 (5,0);
+	array3d tmp2;
 
 	yantra::JointValues tmp_j;
 
@@ -87,28 +88,34 @@ int trajectory_generator(ros::ServiceClient *cl, yantra::JointValues *q, double 
 	}
 
 	//std::vector<double> time = {0, 1.2, 2.34, 5.56, 7.56, 10};
-	std::vector<double> time = {0, 0.10, 0.23, 0.50, 0.76, 0.10};
+	std::vector<double> time = {0, 0.10, 0.23, 0.50, 0.76, 1.0};
 	srv.request.T = time;
 
 	if(cl->call(srv))
 	{
 		for(int i=0; i<5; i++) {
 			std::cout << "Trajectory Coefficient for joint " << i << ":" << std::endl;
+			array2d tmp1;
 			for(int j=0; j<5; j++) {
+				std::vector<double> tmp;
 				for(int k=0; k<4; k++) {
 					std::cout << srv.response.a_qi[i].a_pi[j].a[k] << " | ";
+					tmp.push_back(srv.response.a_qi[i].a_pi[j].a[k]);
 				}
+				tmp1.push_back(tmp);
 				std::cout << std::endl;
 			}
+			a->push_back(tmp1);
 			std::cout<<std::endl;
 		}
 	}
 	else
 	{
 		ROS_INFO("trajectory_generator_server call falied!");
+		return -1;
 	}
 
-	return true;
+	return 0;
 }
 
 
@@ -120,10 +127,11 @@ int main(int argc, char** argv)
 
 	ros::ServiceClient client_IK = node.serviceClient<yantra::InverseKinematics>("inverse_kinematics_server");	//IK = Inverse Kinematics
 	ros::ServiceClient client_TG = node.serviceClient<yantra::TrajectoryGenerator>("trajectory_generator_server");	//TG = Trajectory Generator
-	
+	ros::Publisher pub_jointvalue = node.advertise<std_msgs::Float64MultiArray>("/yantra/yantra_arm_controller/command", 1);
 	ros::Duration wait_time_server(15);
 
 	client_IK.waitForExistence(wait_time_server);
+	client_TG.waitForExistence(wait_time_server);
 
 
 	double q_init[] = {M_PI/4, 0, 0, 0, 0};
@@ -132,9 +140,9 @@ int main(int argc, char** argv)
 	double q_j_velocity[passing_points][5] = {0};
 	double q_j_accel[passing_points][5] = {0};
 	double trajcoeffs[passing_points-1][5];
-	yantra::JointValues t[passing_points];
-	//double a[5][passing_points+1][4];   <-- Correct one
-	double a[5][4];
+	yantra::JointValues waypoint_joint_space[passing_points];
+	array3d coeff_a;
+
 
 	for (int i=0; i<passing_points; i++)
 	{
@@ -158,9 +166,26 @@ int main(int argc, char** argv)
 	
 	for(int i=0; i<passing_points; i++)
 	{
-		t[i] = make_JointValues(&q_j_value[i][0], &q_j_velocity[i][0], &q_j_accel[i][0]);
+		waypoint_joint_space[i] = make_JointValues(&q_j_value[i][0], &q_j_velocity[i][0], &q_j_accel[i][0]);
 	}
-	int err = trajectory_generator(&client_TG, &t[0], &a[0][0]);
+	
+	int err = trajectory_generator(&client_TG, &waypoint_joint_space[0], &coeff_a);
+	if(err != 0) {
+		std::cout << "No Trajectory coefficient was generated!" << std::endl;
+		return 0;
+	}
 
-	std::cout << "Printing the values of Trajectory coefficients" << std::endl;
+
+	/* Applying coefficient sending the the position values */
+	double t = 0.05;
+	std::vector<double> coeff;
+	for(int i=0; i<5; i++)
+	{
+		double one_pt = (coeff_a[i][0][0]*(std::pow(t,3)))+(coeff_a[i][0][1]*(std::pow(t,2)))+(coeff_a[i][0][2]*(t))+(coeff_a[i][0][3]);
+		coeff.push_back(one_pt);
+	}
+	std_msgs::Float64MultiArray pubmsg;
+	pubmsg.data = coeff;
+	pub_jointvalue.publish(pubmsg);
+
 }

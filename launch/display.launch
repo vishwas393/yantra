@@ -14,8 +14,8 @@
 		  file="$(find yantra)/config/yantra_controller.yaml"/>
 
 	<node name="yantra_controller_spawner" pkg="controller_manager" type="spawner" 
-		ns="/yantra" args=  "joint_state_controller 
-		joint_0_1_controller joint_1_2_controller joint_2_3_controller joint_3_4_controller joint_4_51_controller "/>
+		ns="/yantra" args=  "joint_state_controller yantra_arm_controller one_link_controller"/> 
+	<!--joint_0_1_controller joint_1_2_controller joint_2_3_controller joint_3_4_controller joint_4_51_controller "/-->
 </launch>
 
 
