@@ -5,6 +5,7 @@
 #include "yantra/InverseKinematics.h"
 #include "yantra/TrajectoryGenerator.h"
 #include "std_msgs/Float64MultiArray.h"
+#include "yantra/direct_kinematic.h"
 #include <math.h>
 #include <vector>
 
@@ -75,7 +76,7 @@ int apply_IK(ros::ServiceClient *cl, double *pos, double *q_init, double *q)
 
 
 
-int trajectory_generator(ros::ServiceClient *cl, yantra::JointValues *q, array3d* a)
+int trajectory_generator(ros::ServiceClient *cl, yantra::JointValues *q, std::vector<double> time, array3d &a)
 {
 	yantra::TrajectoryGenerator srv;
 	array3d tmp2;
@@ -88,7 +89,7 @@ int trajectory_generator(ros::ServiceClient *cl, yantra::JointValues *q, array3d
 	}
 
 	//std::vector<double> time = {0, 1.2, 2.34, 5.56, 7.56, 10};
-	std::vector<double> time = {0, 0.10, 0.23, 0.50, 0.76, 1.0};
+
 	srv.request.T = time;
 
 	if(cl->call(srv))
@@ -105,7 +106,7 @@ int trajectory_generator(ros::ServiceClient *cl, yantra::JointValues *q, array3d
 				tmp1.push_back(tmp);
 				std::cout << std::endl;
 			}
-			a->push_back(tmp1);
+			a.push_back(tmp1);
 			std::cout<<std::endl;
 		}
 	}
@@ -134,6 +135,10 @@ int main(int argc, char** argv)
 	client_TG.waitForExistence(wait_time_server);
 
 
+
+	//std::vector<double> time = {0, 1.2, 2.34, 5.56, 7.56, 10};
+	std::vector<double> time = {0, 0.10, 0.23, 0.50, 0.76, 1.0};
+
 	double q_init[] = {M_PI/4, 0, 0, 0, 0};
 	double pos[passing_points][3] = {{190, 180, 200} , {210, 220, 200}, {240, 240, 250} , {300, 300, 300}};
 	double q_j_value[passing_points][5];
@@ -142,7 +147,7 @@ int main(int argc, char** argv)
 	double trajcoeffs[passing_points-1][5];
 	yantra::JointValues waypoint_joint_space[passing_points];
 	array3d coeff_a;
-
+	array2d vis_point;		//Final position point calculated from direct kinematics to visualise on a plot
 
 	for (int i=0; i<passing_points; i++)
 	{
@@ -169,23 +174,37 @@ int main(int argc, char** argv)
 		waypoint_joint_space[i] = make_JointValues(&q_j_value[i][0], &q_j_velocity[i][0], &q_j_accel[i][0]);
 	}
 	
-	int err = trajectory_generator(&client_TG, &waypoint_joint_space[0], &coeff_a);
+	int err = trajectory_generator(&client_TG, &waypoint_joint_space[0], time, coeff_a);
 	if(err != 0) {
 		std::cout << "No Trajectory coefficient was generated!" << std::endl;
 		return 0;
 	}
 
 
-	/* Applying coefficient sending the the position values */
-	double t = 0.05;
-	std::vector<double> coeff;
-	for(int i=0; i<5; i++)
+	/*
+	 *
+	// Applying coefficient to get the the position values
+	for (int i=1; i<5; i++)  //waypoints or time
 	{
-		double one_pt = (coeff_a[i][0][0]*(std::pow(t,3)))+(coeff_a[i][0][1]*(std::pow(t,2)))+(coeff_a[i][0][2]*(t))+(coeff_a[i][0][3]);
-		coeff.push_back(one_pt);
+		double diff = (time[i] - time[i-1])/10;
+		for(int j=0; j<10; j++)
+		{
+				double t = time[i] + j*diff;
+				std::vector<double> tmp;
+				for (int k=0; k<5; k++) 	//for each joint
+				{
+					double pt = (coeff_a[i][k][0]*(std::pow(t,3)))+(coeff_a[i][k][1]*(std::pow(t,2)))+(coeff_a[i][k][2]*(t))+(coeff_a[i][k][3]);
+					tmp.push_back(pt);
+				}
+				std::vector<double> pos_point = end_effector_position(&tmp[0]);
+				vis_point.push_back(pos_point);
+		}
 	}
-	std_msgs::Float64MultiArray pubmsg;
-	pubmsg.data = coeff;
-	pub_jointvalue.publish(pubmsg);
+	*
+	*/
 
+
+
+	//double one_pt = (coeff_a[i][0][0]*(std::pow(t,3)))+(coeff_a[i][0][1]*(std::pow(t,2)))+(coeff_a[i][0][2]*(t))+(coeff_a[i][0][3]);
+	
 }

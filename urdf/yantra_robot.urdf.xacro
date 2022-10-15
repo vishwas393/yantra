@@ -50,7 +50,7 @@
 				<mass value="${m}"/>
 
 				<xacro:if value="${rot_axis == 'x'}">
-					<inertia ixx="${m*ht*ht/3}" ixy="0" ixz="0" iyy="0" iyz="0" izz="${m*ht*ht/3}"/>
+					<inertia iyy="${m*ht*ht/3}" ixy="0" ixz="0" ixx="0" iyz="0" izz="${m*ht*ht/3}"/>
 				</xacro:if>
 				<xacro:if value="${rot_axis == 'z'}">
 					<inertia ixx="${m*(3*rad*rad + ht*ht)/12}" ixy="0" ixz="0" iyy="${m*(3*rad*rad + ht*ht)/12}" iyz="0" izz="${m*rad*rad/2}"/>
@@ -88,7 +88,7 @@
 			<child link="link_${clink}"/>
 			<origin xyz="${x} ${y} ${z}" rpy="${rr} ${pp} ${yy}"/>
 			<axis xyz="${rx} ${ry} ${rz}"/>
-			<limit effort="1" upper="3.124" lower="-3.124" velocity="2.094"/>
+			<limit effort="1000000" upper="3.3" lower="-3.3" velocity="200000"/>
 		</joint>
 		</xacro:if>
 	</xacro:macro>
@@ -97,15 +97,15 @@
 
 
 
-	<xacro:macro name="joint_transmission" params="i j">
+	<xacro:macro name="joint_transmission" params="i j r">
 		<transmission name="transmission_${i}_${j}">
 			<type>transmission_interface/SimpleTransmission</type>
 			<actuator name="actuator_${i}_${j}">
 				<mechanicalReduction>1</mechanicalReduction>
-				<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+				<hardwareInterface>EffortJointInterface</hardwareInterface>
 			</actuator>
 			<joint name="joint_${i}_${j}">
-				<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+					<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
 			</joint>
 		</transmission>
 	</xacro:macro>
@@ -157,11 +157,12 @@
 	<xacro:link_joints plink="4" clink="51" x="0" y="0" z="${h4}" rr="0" pp="0" yy="0" jtype="r" rx="0" ry="1" rz="0"/>
 	<xacro:link_joints plink="51" clink="52" x="0" y="0" z="${h51}" rr="0" pp="0" yy="0" jtype="f" rx="0" ry="0" rz="0"/>
 
-	<xacro:joint_transmission i="0" j="1"/>
-	<xacro:joint_transmission i="1" j="2"/>
-	<xacro:joint_transmission i="2" j="3"/>
-	<xacro:joint_transmission i="3" j="4"/>
-	<xacro:joint_transmission i="4" j="51"/>
+
+	<xacro:joint_transmission i="0" j="1" r="1"/>
+	<xacro:joint_transmission i="1" j="2" r="50"/>
+	<xacro:joint_transmission i="2" j="3" r="50"/>
+	<xacro:joint_transmission i="3" j="4" r="50"/>
+	<xacro:joint_transmission i="4" j="51" r="50"/>
 
 
 	<gazebo>
