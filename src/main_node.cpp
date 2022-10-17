@@ -6,13 +6,65 @@
 #include "yantra/TrajectoryGenerator.h"
 #include "std_msgs/Float64MultiArray.h"
 #include "yantra/direct_kinematic.h"
-#include <math.h>
+#include <cmath>
 #include <vector>
 
 int passing_points = 4;
 
 typedef std::vector<std::vector<double>> array2d;
 typedef std::vector<std::vector<std::vector<double>>> array3d;
+
+
+class Publish_Timer
+{
+	public:
+		Publish_Timer(ros::Publisher& _pub, array3d& _a, double _t)
+		{
+			pub = _pub;
+			coeff_a = _a;
+			end_time = _t - 1;
+		}
+
+		void callback(const ros::TimerEvent& event)
+		{
+			int path_seg = time_count / 5;
+			jvalpub.at(0) = (coeff_a[0][path_seg][0]*(std::pow(time_count,3)))+(coeff_a[0][path_seg][1]*(std::pow(time_count,2)))+(coeff_a[0][path_seg][2]*(time_count))+(coeff_a[0][path_seg][3]);
+			jvalpub.at(1) = (coeff_a[1][path_seg][0]*(std::pow(time_count,3)))+(coeff_a[1][path_seg][1]*(std::pow(time_count,2)))+(coeff_a[1][path_seg][2]*(time_count))+(coeff_a[1][path_seg][3]);
+			jvalpub.at(2) = (coeff_a[2][path_seg][0]*(std::pow(time_count,3)))+(coeff_a[2][path_seg][1]*(std::pow(time_count,2)))+(coeff_a[2][path_seg][2]*(time_count))+(coeff_a[2][path_seg][3]);
+			jvalpub.at(3) = (coeff_a[3][path_seg][0]*(std::pow(time_count,3)))+(coeff_a[3][path_seg][1]*(std::pow(time_count,2)))+(coeff_a[3][path_seg][2]*(time_count))+(coeff_a[3][path_seg][3]);
+			jvalpub.at(4) = (coeff_a[4][path_seg][0]*(std::pow(time_count,3)))+(coeff_a[4][path_seg][1]*(std::pow(time_count,2)))+(coeff_a[4][path_seg][2]*(time_count))+(coeff_a[4][path_seg][3]);
+
+			pub_msg.data = jvalpub;
+			pub.publish(pub_msg);
+			if(time_count == end_time)
+				stop();
+			else
+				time_count++;
+
+		}	
+
+		void start(ros::NodeHandle& _nh)
+		{
+			timer = _nh.createTimer(ros::Duration(1), &Publish_Timer::callback, this);
+		}
+
+		void stop()
+		{
+			timer.stop();
+		}
+
+	private:
+		int time_count = 0;
+		ros::Publisher pub;
+		ros::Timer timer;
+		array3d coeff_a;
+		double end_time;
+		std::vector<double> jvalpub = std::vector<double>(5, 0);
+		std_msgs::Float64MultiArray pub_msg;
+};
+
+
+
 
 yantra::JointValues make_JointValues(double *q_val, double *q_velocity, double *q_accel)
 {
@@ -136,8 +188,8 @@ int main(int argc, char** argv)
 
 
 
-	//std::vector<double> time = {0, 1.2, 2.34, 5.56, 7.56, 10};
-	std::vector<double> time = {0, 0.10, 0.23, 0.50, 0.76, 1.0};
+	std::vector<double> time = {0, 5, 10, 15, 20, 25};
+	//std::vector<double> time = {0, 0.10, 0.23, 0.50, 0.76, 1.0};
 
 	double q_init[] = {M_PI/4, 0, 0, 0, 0};
 	double pos[passing_points][3] = {{190, 180, 200} , {210, 220, 200}, {240, 240, 250} , {300, 300, 300}};
@@ -202,9 +254,12 @@ int main(int argc, char** argv)
 	}
 	*
 	*/
-
-
-
 	//double one_pt = (coeff_a[i][0][0]*(std::pow(t,3)))+(coeff_a[i][0][1]*(std::pow(t,2)))+(coeff_a[i][0][2]*(t))+(coeff_a[i][0][3]);
 	
+	Publish_Timer _timer(pub_jointvalue, coeff_a, time.at(time.size()-1));
+	_timer.start(node);			//Timer will stop automatically whwn time_count has reached 24 (sec) 
+	std::cout << "Timer should start";
+	ros::spin();
 }
+
+

@@ -73,7 +73,7 @@
 
 
 
-	<xacro:macro name="link_joints" params="plink clink jtype x y z rx ry rz rr pp yy">
+	<xacro:macro name="link_joints" params="plink clink jtype x y z rx ry rz rr pp yy efrt">
 		<xacro:if value="${jtype == 'f'}">
 		<joint name="joint_${plink}_${clink}" type="fixed">
 			<parent link="link_${plink}"/>
@@ -88,7 +88,7 @@
 			<child link="link_${clink}"/>
 			<origin xyz="${x} ${y} ${z}" rpy="${rr} ${pp} ${yy}"/>
 			<axis xyz="${rx} ${ry} ${rz}"/>
-			<limit effort="1000000" upper="3.3" lower="-3.3" velocity="200000"/>
+			<limit effort="${efrt}" upper="3.3" lower="-3.3" velocity="200000"/>
 		</joint>
 		</xacro:if>
 	</xacro:macro>
@@ -97,7 +97,7 @@
 
 
 
-	<xacro:macro name="joint_transmission" params="i j r">
+	<xacro:macro name="joint_transmission" params="i j">
 		<transmission name="transmission_${i}_${j}">
 			<type>transmission_interface/SimpleTransmission</type>
 			<actuator name="actuator_${i}_${j}">
@@ -150,19 +150,19 @@
 	<xacro:link i="52" r="0" p="${pi/2}" x="${h52/2 - r51}" y="0" z="0" m="${m52}" rad="${r52}" ht="${h52}" rot_axis="n"/>
 
 
-	<xacro:link_joints plink="0" clink="1" x="0" y="0" z="${h0}" rr="0" pp="0" yy="0" jtype="r" rx="0" ry="0" rz="1"/>
-	<xacro:link_joints plink="1" clink="2" x="0" y="0" z="${h1}" rr="0" pp="0" yy="0" jtype="r" rx="0" ry="1" rz="0"/>
-	<xacro:link_joints plink="2" clink="3" x="0" y="0" z="${h2}" rr="0" pp="0" yy="0" jtype="r" rx="0" ry="1" rz="0"/>
-	<xacro:link_joints plink="3" clink="4" x="0" y="0" z="${h3}" rr="0" pp="0" yy="0" jtype="r" rx="0" ry="0" rz="1"/>
-	<xacro:link_joints plink="4" clink="51" x="0" y="0" z="${h4}" rr="0" pp="0" yy="0" jtype="r" rx="0" ry="1" rz="0"/>
-	<xacro:link_joints plink="51" clink="52" x="0" y="0" z="${h51}" rr="0" pp="0" yy="0" jtype="f" rx="0" ry="0" rz="0"/>
+	<xacro:link_joints plink="0" clink="1" x="0" y="0" z="${h0}" rr="0" pp="0" yy="0" jtype="r" rx="0" ry="0" rz="1" efrt="10"/>
+	<xacro:link_joints plink="1" clink="2" x="0" y="0" z="${h1}" rr="0" pp="0" yy="0" jtype="r" rx="0" ry="1" rz="0" efrt="500"/>
+	<xacro:link_joints plink="2" clink="3" x="0" y="0" z="${h2}" rr="0" pp="0" yy="0" jtype="r" rx="0" ry="1" rz="0" efrt="300"/>
+	<xacro:link_joints plink="3" clink="4" x="0" y="0" z="${h3}" rr="0" pp="0" yy="0" jtype="r" rx="0" ry="0" rz="1" efrt="10"/>
+	<xacro:link_joints plink="4" clink="51" x="0" y="0" z="${h4}" rr="0" pp="0" yy="0" jtype="r" rx="0" ry="1" rz="0" efrt="10"/>
+	<xacro:link_joints plink="51" clink="52" x="0" y="0" z="${h51}" rr="0" pp="0" yy="0" jtype="f" rx="0" ry="0" rz="0" efrt="10"/>
 
 
-	<xacro:joint_transmission i="0" j="1" r="1"/>
-	<xacro:joint_transmission i="1" j="2" r="50"/>
-	<xacro:joint_transmission i="2" j="3" r="50"/>
-	<xacro:joint_transmission i="3" j="4" r="50"/>
-	<xacro:joint_transmission i="4" j="51" r="50"/>
+	<xacro:joint_transmission i="0" j="1"/>
+	<xacro:joint_transmission i="1" j="2"/>
+	<xacro:joint_transmission i="2" j="3"/>
+	<xacro:joint_transmission i="3" j="4"/>
+	<xacro:joint_transmission i="4" j="51"/>
 
 
 	<gazebo>
