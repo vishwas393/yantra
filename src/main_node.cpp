@@ -27,7 +27,7 @@ class Publish_Timer
 
 		void callback(const ros::TimerEvent& event)
 		{
-			int path_seg = time_count / 5;
+			int path_seg = static_cast<int>(time_count) / 3;
 			jvalpub.at(0) = (coeff_a[0][path_seg][0]*(std::pow(time_count,3)))+(coeff_a[0][path_seg][1]*(std::pow(time_count,2)))+(coeff_a[0][path_seg][2]*(time_count))+(coeff_a[0][path_seg][3]);
 			jvalpub.at(1) = (coeff_a[1][path_seg][0]*(std::pow(time_count,3)))+(coeff_a[1][path_seg][1]*(std::pow(time_count,2)))+(coeff_a[1][path_seg][2]*(time_count))+(coeff_a[1][path_seg][3]);
 			jvalpub.at(2) = (coeff_a[2][path_seg][0]*(std::pow(time_count,3)))+(coeff_a[2][path_seg][1]*(std::pow(time_count,2)))+(coeff_a[2][path_seg][2]*(time_count))+(coeff_a[2][path_seg][3]);
@@ -36,16 +36,19 @@ class Publish_Timer
 
 			pub_msg.data = jvalpub;
 			pub.publish(pub_msg);
-			if(time_count == end_time)
+			if(time_count == end_time) {
 				stop();
-			else
-				time_count++;
+			}
+			else {
+				time_count += 0.5;
+				ROS_INFO_STREAM("Point number: " << time_count);
+			}
 
 		}	
 
 		void start(ros::NodeHandle& _nh)
 		{
-			timer = _nh.createTimer(ros::Duration(1), &Publish_Timer::callback, this);
+			timer = _nh.createTimer(ros::Duration(0.5), &Publish_Timer::callback, this);
 		}
 
 		void stop()
@@ -54,7 +57,7 @@ class Publish_Timer
 		}
 
 	private:
-		int time_count = 0;
+		double time_count = 0;
 		ros::Publisher pub;
 		ros::Timer timer;
 		array3d coeff_a;
@@ -188,7 +191,7 @@ int main(int argc, char** argv)
 
 
 
-	std::vector<double> time = {0, 5, 10, 15, 20, 25};
+	std::vector<double> time = {0, 3, 6, 9, 12, 15};
 	//std::vector<double> time = {0, 0.10, 0.23, 0.50, 0.76, 1.0};
 
 	double q_init[] = {M_PI/4, 0, 0, 0, 0};

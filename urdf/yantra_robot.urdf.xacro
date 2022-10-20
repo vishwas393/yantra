@@ -102,10 +102,10 @@
 			<type>transmission_interface/SimpleTransmission</type>
 			<actuator name="actuator_${i}_${j}">
 				<mechanicalReduction>1</mechanicalReduction>
-				<hardwareInterface>EffortJointInterface</hardwareInterface>
+				<hardwareInterface>VelocityJointInterface</hardwareInterface>
 			</actuator>
 			<joint name="joint_${i}_${j}">
-					<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+					<hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
 			</joint>
 		</transmission>
 	</xacro:macro>
