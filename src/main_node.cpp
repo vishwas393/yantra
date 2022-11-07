@@ -5,7 +5,7 @@
 #include "yantra/InverseKinematics.h"
 #include "yantra/TrajectoryGenerator.h"
 #include "std_msgs/Float64MultiArray.h"
-#include "yantra/direct_kinematic.h"
+//#include "yantra/direct_kinematic.h"
 #include <cmath>
 #include <vector>
 
