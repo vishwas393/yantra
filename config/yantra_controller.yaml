@@ -1,26 +1,26 @@
 /yantra:
-  gazebo_ros_control:
-    pid_gains:
-      joint_0_1: 
-        p: 1.0
-        i: 0.0
-        d: 0.0
-      joint_1_2: &joint_1_2_gains
-        p: 1.0
-        i: 0.0
-        d: 0.0
-      joint_2_3: &joint_2_3_gains
-        p: 1.0
-        i: 0.0
-        d: 0.0
-      joint_3_4: &joint_3_4_gains
-        p: 1.0
-        i: 0.0
-        d: 0.0
-      joint_4_51: &joint_4_51_gains
-        p: 1.0
-        i: 0.0
-        d: 0.0
+#  gazebo_ros_control:
+#    pid_gains:
+#      joint_0_1: 
+#        p: 1.0
+#        i: 0.0
+#        d: 0.0
+#      joint_1_2: &joint_1_2_gains
+#        p: 1.0
+#        i: 0.0
+#        d: 0.0
+#      joint_2_3: &joint_2_3_gains
+#        p: 1.0
+#        i: 0.0
+#        d: 0.0
+#      joint_3_4: &joint_3_4_gains
+#        p: 1.0
+#        i: 0.0
+#        d: 0.0
+#      joint_4_51: &joint_4_51_gains
+#        p: 1.0
+#        i: 0.0
+#        d: 0.0
 
   joint_state_controller:
     type: joint_state_controller/JointStateController
@@ -35,27 +35,27 @@
   link_one_controller:
     type: velocity_controllers/JointVelocityController
     joint: joint_0_1
-#    pid: {p: 1.0, i: 0.0, d: 0.0, i_clamp_min: -0.0, i_clamp_max: 0.0}
+    pid: {p: 0.01, i: 0.0, d: 0.0, i_clamp_min: -0.0, i_clamp_max: 0.0}
 
   link_two_controller:
     type: velocity_controllers/JointVelocityController
     joint: joint_1_2
-#    pid: {p: 300.0, i: 2.0, d: 100.0, i_clamp_min: -1000.0, i_clamp_max: 1000.0}
+    pid: {p: 0.0, i: 0.0, d: 0.0, i_clamp_min: -1000.0, i_clamp_max: 1000.0}
 
   link_three_controller:
     type: velocity_controllers/JointVelocityController
     joint: joint_2_3
-#    pid: {p: 900.0, i: 1.0, d: 200.0, i_clamp_min: -1000.0, i_clamp_max: 1000.0}
+    pid: {p: 0.0, i: 0.0, d: 0.0, i_clamp_min: -1000.0, i_clamp_max: 1000.0}
 
   link_four_controller:
     type: velocity_controllers/JointVelocityController
     joint: joint_3_4
-#    pid: {p: 5.0, i: 0.1, d: 0.5, i_clamp_min: -1000.0, i_clamp_max: 1000.0}
+    pid: {p: 0.0, i: 0.0, d: 0.0, i_clamp_min: -1000.0, i_clamp_max: 1000.0}
 
   link_five_controller:
     type: velocity_controllers/JointVelocityController
     joint: joint_4_51
-#    pid: {p: 200.0, i: 5.0, d: 60.0, i_clamp_min: -1000.0, i_clamp_max: 1000.0}
+    pid: {p: 0.0, i: 0.0, d: 0.0, i_clamp_min: -1000.0, i_clamp_max: 1000.0}
 
 
 
