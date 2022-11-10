@@ -10,21 +10,32 @@
 	</include>
 
 
-	<rosparam command="load" 
-		  file="$(find yantra)/config/yantra_controller.yaml"/>
+	<rosparam command="load" file="$(find yantra)/config/yantra_controller.yaml"/>
+	<rosparam command="load" file="$(find yantra)/config/controller_groups.yaml"/>
 	
 	<!--node name="yantra_controller_spawner" pkg="controller_manager" type="spawner" 
 			ns="/yantra" args=  "joint_state_controller  yantra_arm_controller "/--> 
 
-	<node name="yantra_controller_spawner" pkg="controller_manager" type="spawner" 
-			ns="/yantra" args=  "joint_state_controller 
-			link_one_controller	
-			link_two_controller
-			link_three_controller	
-			link_four_controller	
-			link_five_controller"/> 
+	<node name="yantra_joint_state_controller_spawner" pkg="controller_manager" type="spawner" 
+			ns="/yantra" args= " joint_state_controller" />
+	
+
+	<node name="yantra_velocity_controller_spawner" pkg="controller_manager" type="spawner" 
+			ns="/yantra" args= " --stopped 
+			link_one_vel_controller	
+			link_two_vel_controller"/>	
+	<!--link_three_vel_controller	
+			link_four_vel_controller	
+			link_five_vel_controller--> 
 
 
+	<node name="yantra_position_controller_spawner" pkg="controller_manager" type="spawner" 
+			ns="/yantra" args=  "
+			link_one_pos_controller
+			link_two_pos_controller"/>
+	<!--link_three_pos_controller	
+			link_four_pos_controller	
+			link_five_pos_controller--> 
 
 	<node name="rqt_plot" pkg="rqt_plot" type="rqt_plot"/>
 	<node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure"/>

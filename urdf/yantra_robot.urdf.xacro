@@ -143,30 +143,30 @@
 
 	<xacro:link i="0" r="0" p="0" x="0" y="0" z="${h0/2}" m="${m0}" rad="${r0}" ht="${h0}" rot_axis="z"/>
 	<xacro:link i="1" r="0" p="0" x="0" y="0" z="${h1/2}" m="${m1}" rad="${r1}" ht="${h1}" rot_axis="z"/>
-
 	<xacro:link i="2" r="0" p="0" x="0" y="0" z="${h2/2}" m="${m2}" rad="${r2}" ht="${h2}" rot_axis="x"/>
+	<!--
 	<xacro:link i="3" r="0" p="0" x="0" y="0" z="${h3/2}" m="${m3}" rad="${r3}" ht="${h3}" rot_axis="x"/>
 	<xacro:link i="4" r="0" p="0" x="0" y="0" z="${h4/2}" m="${m4}" rad="${r4}" ht="${h4}" rot_axis="z"/>
 	<xacro:link i="51" r="0" p="0" x="0" y="0" z="${h51/2}" m="${m51}" rad="${r51}" ht="${h51}" rot_axis="x"/>
 	<xacro:link i="52" r="0" p="${pi/2}" x="${h52/2 - r51}" y="0" z="0" m="${m52}" rad="${r52}" ht="${h52}" rot_axis="n"/>
-
+	-->
 
 	<xacro:link_joints plink="0" clink="1" x="0" y="0" z="${h0}" rr="0" pp="0" yy="0" jtype="r" rx="0" ry="0" rz="1" efrt="10"/>
-
 	<xacro:link_joints plink="1" clink="2" x="0" y="0" z="${h1}" rr="0" pp="0" yy="0" jtype="r" rx="0" ry="1" rz="0" efrt="500"/>
+	<!--
 	<xacro:link_joints plink="2" clink="3" x="0" y="0" z="${h2}" rr="0" pp="0" yy="0" jtype="r" rx="0" ry="1" rz="0" efrt="300"/>
 	<xacro:link_joints plink="3" clink="4" x="0" y="0" z="${h3}" rr="0" pp="0" yy="0" jtype="r" rx="0" ry="0" rz="1" efrt="10"/>
 	<xacro:link_joints plink="4" clink="51" x="0" y="0" z="${h4}" rr="0" pp="0" yy="0" jtype="r" rx="0" ry="1" rz="0" efrt="10"/>
 	<xacro:link_joints plink="51" clink="52" x="0" y="0" z="${h51}" rr="0" pp="0" yy="0" jtype="f" rx="0" ry="0" rz="0" efrt="10"/>
-
+	-->
 
 	<xacro:joint_transmission i="0" j="1"/>
-
 	<xacro:joint_transmission i="1" j="2"/>
+	<!--
 	<xacro:joint_transmission i="2" j="3"/>
 	<xacro:joint_transmission i="3" j="4"/>
 	<xacro:joint_transmission i="4" j="51"/>
-
+	-->
 
 	<gazebo>
 		<plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
