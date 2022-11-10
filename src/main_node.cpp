@@ -5,9 +5,14 @@
 #include "yantra/InverseKinematics.h"
 #include "yantra/TrajectoryGenerator.h"
 #include "std_msgs/Float64MultiArray.h"
+#include "std_msgs/Float64.h"
+#include "std_msgs/String.h"
+#include "controller_manager_msgs/SwitchController.h"
+#include "controller_manager/controller_manager.h"
 //#include "yantra/direct_kinematic.h"
 #include <cmath>
 #include <vector>
+#include <cstring>
 
 int passing_points = 4;
 
@@ -15,14 +20,21 @@ typedef std::vector<std::vector<double>> array2d;
 typedef std::vector<std::vector<std::vector<double>>> array3d;
 
 
+#include <ros/console.h>
+
+
+
+
 class Publish_Timer
 {
 	public:
-		Publish_Timer(ros::Publisher& _pub, array3d& _a, double _t)
+		Publish_Timer(ros::NodeHandle& _nh, array3d& _a, double _t)
 		{
-			pub = _pub;
 			coeff_a = _a;
 			end_time = _t - 1;
+
+			pub_joint1value = _nh.advertise<std_msgs::Float64>("/yantra/link_one_vel_controller/command", 1);
+			pub_joint2value = _nh.advertise<std_msgs::Float64>("/yantra/link_two_vel_controller/command", 1);
 		}
 
 		void callback(const ros::TimerEvent& event)
@@ -34,8 +46,17 @@ class Publish_Timer
 			jvalpub.at(3) = (coeff_a[3][path_seg][0]*(std::pow(time_count,3)))+(coeff_a[3][path_seg][1]*(std::pow(time_count,2)))+(coeff_a[3][path_seg][2]*(time_count))+(coeff_a[3][path_seg][3]);
 			jvalpub.at(4) = (coeff_a[4][path_seg][0]*(std::pow(time_count,3)))+(coeff_a[4][path_seg][1]*(std::pow(time_count,2)))+(coeff_a[4][path_seg][2]*(time_count))+(coeff_a[4][path_seg][3]);
 
-			pub_msg.data = jvalpub;
-			pub.publish(pub_msg);
+			pub_1msg.data = 0.1;	//jvalpub(0);
+			pub_2msg.data = 0.8;	//jvalpub(1);
+			//pub_3msg.data = jvalpub(2);
+			//pub_4msg.data = jvalpub(3);
+			//pub_5msg.data = jvalpub(4);
+			pub_joint1value.publish(pub_1msg);
+			pub_joint2value.publish(pub_2msg);
+			//pub_joint3value.publish(pub_3msg);
+			//pub_joint4value.publish(pub_4msg);
+			//pub_joint5value.publish(pub_5msg);
+
 			if(time_count == end_time) {
 				stop();
 			}
@@ -53,17 +74,29 @@ class Publish_Timer
 
 		void stop()
 		{
+			std::cout << "Timer stops now" << std::endl;
 			timer.stop();
 		}
 
 	private:
 		double time_count = 0;
-		ros::Publisher pub;
+		//ros::Publisher pub;
 		ros::Timer timer;
 		array3d coeff_a;
 		double end_time;
 		std::vector<double> jvalpub = std::vector<double>(5, 0);
-		std_msgs::Float64MultiArray pub_msg;
+		
+		std_msgs::Float64 pub_1msg;
+		std_msgs::Float64 pub_2msg;
+		//std_msgs::Float64 pub_3msg;
+		//std_msgs::Float64 pub_4msg;
+		//std_msgs::Float64 pub_5msg;
+
+		ros::Publisher pub_joint1value; //= nh->advertise<std_msgs::Float64>("/yantra/link_one_vel_controller/command", 1);
+		ros::Publisher pub_joint2value; //= nh->advertise<std_msgs::Float64>("/yantra/link_two_vel_controller/command", 1);
+		//ros::Publisher pub_joint3value = node.advertise<std_msgs::Float64>("/yantra/link_three_vel_controller/command", 1);
+		//ros::Publisher pub_joint4value = node.advertise<std_msgs::Float64>("/yantra/link_four_vel_controller/command", 1);
+		//ros::Publisher pub_joint5value = node.advertise<std_msgs::Float64>("/yantra/link_five_vel_controller/command", 1);
 };
 
 
@@ -181,17 +214,42 @@ int main(int argc, char** argv)
 	ros::init(argc, argv, "main_node");
 	ros::NodeHandle node;
 
+	char nn;
+	std::cout << "should I start?" << std::endl;
+	std::cin >> nn;
+
+
+
+	ros::ServiceClient client_controller_change = node.serviceClient<controller_manager_msgs::SwitchController>("/yantra/controller_manager/switch_controller");	//IK = Inverse Kinematics
 	ros::ServiceClient client_IK = node.serviceClient<yantra::InverseKinematics>("inverse_kinematics_server");	//IK = Inverse Kinematics
 	ros::ServiceClient client_TG = node.serviceClient<yantra::TrajectoryGenerator>("trajectory_generator_server");	//TG = Trajectory Generator
-	ros::Publisher pub_jointvalue = node.advertise<std_msgs::Float64MultiArray>("/yantra/yantra_arm_controller/command", 1);
+	/*
+	ros::Publisher pub_joint1value = node.advertise<std_msgs::Float64>("/yantra/link_one_vel_controller/command", 1);
+	ros::Publisher pub_joint2value = node.advertise<std_msgs::Float64>("/yantra/link_two_vel_controller/command", 1);
+	ros::Publisher pub_joint3value = node.advertise<std_msgs::Float64>("/yantra/link_three_vel_controller/command", 1);
+	ros::Publisher pub_joint4value = node.advertise<std_msgs::Float64>("/yantra/link_four_vel_controller/command", 1);
+	ros::Publisher pub_joint5value = node.advertise<std_msgs::Float64>("/yantra/link_five_vel_controller/command", 1);
+	*/
 	ros::Duration wait_time_server(15);
 
 	client_IK.waitForExistence(wait_time_server);
 	client_TG.waitForExistence(wait_time_server);
 
+	controller_manager_msgs::SwitchController controller_change_srv;
+	std::vector<std::string> pos_controller; 
+	std::vector<std::string> vel_controller; 
+	
+	pos_controller.push_back("link_one_pos_controller");
+	pos_controller.push_back("link_two_pos_controller");
+
+	vel_controller.push_back("link_one_vel_controller");
+	vel_controller.push_back("link_two_vel_controller");
+
+
 
 
 	std::vector<double> time = {0, 3, 6, 9, 12, 15};
+
 	//std::vector<double> time = {0, 0.10, 0.23, 0.50, 0.76, 1.0};
 
 	double q_init[] = {M_PI/4, 0, 0, 0, 0};
@@ -259,8 +317,23 @@ int main(int argc, char** argv)
 	*/
 	//double one_pt = (coeff_a[i][0][0]*(std::pow(t,3)))+(coeff_a[i][0][1]*(std::pow(t,2)))+(coeff_a[i][0][2]*(t))+(coeff_a[i][0][3]);
 	
-	Publish_Timer _timer(pub_jointvalue, coeff_a, time.at(time.size()-1));
-	_timer.start(node);			//Timer will stop automatically whwn time_count has reached 24 (sec) 
+	Publish_Timer _timer(node, coeff_a, time.at(time.size()-1));
+
+	std::cout << vel_controller.size() << " , " << pos_controller.size();
+
+	controller_change_srv.request.start_controllers = vel_controller;
+	controller_change_srv.request.stop_controllers = pos_controller;
+	controller_change_srv.request.strictness = 2;
+	controller_change_srv.request.start_asap = true;
+	controller_change_srv.request.timeout = 0.0;
+
+	bool status = client_controller_change.call(controller_change_srv);
+	std::cout << "status of controller change service: " << status << std::endl;
+	if (status == true) {
+			std::cout << "controller_change successful";
+			_timer.start(node);			//Timer will stop automatically whwn time_count has reached 24 (sec) 
+	}
+	
 	std::cout << "Timer should start";
 	ros::spin();
 }
