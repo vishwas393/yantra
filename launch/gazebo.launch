@@ -25,7 +25,10 @@
   <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
 		  args="-x 0 -y 0 -z 0 -unpause -urdf -model yantra -param robot_description
 		  -J joint_0_1 0
-		  -J joint_1_2 1
+		  -J joint_1_2 0
+		  -J joint_2_3 0
+		  -J joint_3_4 0
+		  -J joint_4_51 0
 		  " respawn="false" output="screen" />
 
   <node pkg="robot_state_publisher" type="robot_state_publisher"  name="robot_state_publisher">
