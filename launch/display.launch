@@ -13,15 +13,15 @@
 	<rosparam command="load" file="$(find yantra)/config/yantra_controller.yaml"/>
 	<rosparam command="load" file="$(find yantra)/config/controller_groups.yaml"/>
 	
-	<!--node name="yantra_arm_controller_spawner" pkg="controller_manager" type="spawner" 
-			ns="/yantra" args=  "yantra_arm_controller "/--> 
+	<node name="yantra_arm_controller_spawner" pkg="controller_manager" type="spawner" 
+			ns="/yantra" args=  "yantra_arm_controller "/> 
 
 	<node name="yantra_joint_state_controller_spawner" pkg="controller_manager" type="spawner" 
 			ns="/yantra" args= " joint_state_controller" />
 	
 
 	<node name="yantra_velocity_controller_spawner" pkg="controller_manager" type="spawner" 
-			ns="/yantra" args= "  
+			ns="/yantra" args= " --stopped 
 			link_one_vel_controller	
 			link_two_vel_controller
 			link_three_vel_controller	

@@ -38,16 +38,19 @@ class Publish_Timer
 			pub_joint3value = _nh.advertise<std_msgs::Float64>("/yantra/link_three_vel_controller/command", 1);
 			pub_joint4value = _nh.advertise<std_msgs::Float64>("/yantra/link_four_vel_controller/command", 1);
 			pub_joint5value = _nh.advertise<std_msgs::Float64>("/yantra/link_five_vel_controller/command", 1);
+
+			std::cout << "Timer class instance created!" <<std::endl;
 		}
 
 		void callback(const ros::TimerEvent& event)
 		{
+			std::cout << "Callback called!" << std::endl;
 			int path_seg = static_cast<int>(time_count) / 3;
-			jvalpub.at(0) = (coeff_a[0][path_seg][0]*(std::pow(time_count,3)))+(coeff_a[0][path_seg][1]*(std::pow(time_count,2)))+(coeff_a[0][path_seg][2]*(time_count))+(coeff_a[0][path_seg][3]);
-			jvalpub.at(1) = (coeff_a[1][path_seg][0]*(std::pow(time_count,3)))+(coeff_a[1][path_seg][1]*(std::pow(time_count,2)))+(coeff_a[1][path_seg][2]*(time_count))+(coeff_a[1][path_seg][3]);
-			jvalpub.at(2) = (coeff_a[2][path_seg][0]*(std::pow(time_count,3)))+(coeff_a[2][path_seg][1]*(std::pow(time_count,2)))+(coeff_a[2][path_seg][2]*(time_count))+(coeff_a[2][path_seg][3]);
-			jvalpub.at(3) = (coeff_a[3][path_seg][0]*(std::pow(time_count,3)))+(coeff_a[3][path_seg][1]*(std::pow(time_count,2)))+(coeff_a[3][path_seg][2]*(time_count))+(coeff_a[3][path_seg][3]);
-			jvalpub.at(4) = (coeff_a[4][path_seg][0]*(std::pow(time_count,3)))+(coeff_a[4][path_seg][1]*(std::pow(time_count,2)))+(coeff_a[4][path_seg][2]*(time_count))+(coeff_a[4][path_seg][3]);
+			jvalpub.at(0) = (3*coeff_a[0][path_seg][0]*(std::pow(time_count,2)))+(2*coeff_a[0][path_seg][1]*time_count)+(coeff_a[0][path_seg][2]);
+			jvalpub.at(1) = (3*coeff_a[1][path_seg][0]*(std::pow(time_count,2)))+(2*coeff_a[1][path_seg][1]*time_count)+(coeff_a[1][path_seg][2]);
+			jvalpub.at(2) = (3*coeff_a[2][path_seg][0]*(std::pow(time_count,2)))+(2*coeff_a[2][path_seg][1]*time_count)+(coeff_a[2][path_seg][2]);
+			jvalpub.at(3) = (3*coeff_a[3][path_seg][0]*(std::pow(time_count,2)))+(2*coeff_a[3][path_seg][1]*time_count)+(coeff_a[3][path_seg][2]);
+			jvalpub.at(4) = (3*coeff_a[4][path_seg][0]*(std::pow(time_count,2)))+(2*coeff_a[4][path_seg][1]*time_count)+(coeff_a[4][path_seg][2]);
 
 			pub_1msg.data = jvalpub.at(0);
 			pub_2msg.data = jvalpub.at(1);
@@ -72,12 +75,25 @@ class Publish_Timer
 
 		void start(ros::NodeHandle& _nh)
 		{
-			timer = _nh.createTimer(ros::Duration(0.5), &Publish_Timer::callback, this);
+			timer = _nh.createTimer(ros::Duration(0.5), &Publish_Timer::callback, this);\
+			std::cout << "Timer started!" << std::endl;
 		}
 
 		void stop()
 		{
 			std::cout << "Timer stops now" << std::endl;
+
+			pub_1msg.data = 0;
+			pub_2msg.data = 0;
+			pub_3msg.data = 0;
+			pub_4msg.data = 0;
+			pub_5msg.data = 0;
+			pub_joint1value.publish(pub_1msg);
+			pub_joint2value.publish(pub_2msg);
+			pub_joint3value.publish(pub_3msg);
+			pub_joint4value.publish(pub_4msg);
+			pub_joint5value.publish(pub_5msg);
+			
 			timer.stop();
 		}
 
@@ -243,7 +259,7 @@ int main(int argc, char** argv)
 	//std::vector<double> time = {0, 0.10, 0.23, 0.50, 0.76, 1.0};
 
 	double q_init[] = {M_PI/4, 0, 0, 0, 0};
-	double pos[passing_points][3] = {{190, 180, 200} , {210, 220, 200}, {240, 240, 250} , {300, 300, 300}};
+	double pos[passing_points][3] = {{190, 180, 280} , {190, 180, 260}, {190, 180, 240} , {190, 180, 200}};
 	double q_j_value[passing_points][5];
 	double q_j_velocity[passing_points][5] = {0};
 	double q_j_accel[passing_points][5] = {0};
@@ -346,13 +362,15 @@ int main(int argc, char** argv)
 	 * Changin thr controller from Position COntroller to Velocity Controller.
 	 * If successful, start the timer and publish the joint velocity as defined in timer callback function
 	 */
+	
+	Publish_Timer _timer(node, coeff_a, time.at(time.size()-1));
 	if (client_CC.call(controller_change_srv)) {
-			std::cout << "controller_change successful";
-			Publish_Timer _timer(node, coeff_a, time.at(time.size()-1));
-			_timer.start(node);			//Timer will stop automatically whwn time_count has reached 24 (sec) 
+			std::cout << "controller_change successful" << std::endl;
+
+			_timer.start(node);			//Timer will stop automatically whwn time_count has reached end time (sec) 
 	}
 	
-	std::cout << "Timer should start";
+	std::cout << "Timer should start" << std::endl;
 	ros::spin();
 }
 
