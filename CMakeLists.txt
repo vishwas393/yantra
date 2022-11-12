@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   urdf
   gazebo_msgs
+  control_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -138,6 +139,10 @@ add_executable(trajectory_generator_service src/trajectory_generator_service.cpp
 add_dependencies(trajectory_generator_service ${${PROJECT_NAME}_EXPORTED_TARGET} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(trajectory_generator_service ${catkin_LIBRARIES})
 
+add_executable(pid_param_mapping src/test/pid_param_mapping.cpp)
+add_dependencies(pid_param_mapping ${${PROJECT_NAME}_EXPORTED_TARGET} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(pid_param_mapping ${catkin_LIBRARIES})
+
 #add_executable(direct_kinematic lib/yantra/direct_kinematic.cpp)
 #add_dependencies(direct_kinematic ${${PROJECT_NAME}_EXPORTED_TARGET} ${catkin_EXPORTED_TARGETS})
 #target_link_libraries(direct_kinematic ${catkin_LIBRARIES})
@@ -184,17 +189,17 @@ catkin_install_python(PROGRAMS
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-install(TARGETS main_node trajectory_generator_service 
+install(TARGETS main_node trajectory_generator_service pid_param_mapping
 		RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 ## Mark libraries for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_libraries.html
- install(TARGETS direct_kinematic
-   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
- )
+# install(TARGETS direct_kinematic
+#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
+# )
 
 ## Mark cpp header files for installation
  install(DIRECTORY include/${PROJECT_NAME}/
