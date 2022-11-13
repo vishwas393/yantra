@@ -18,9 +18,9 @@ typedef std::vector<std::vector<std::vector<double>>> array3d;
 class Publish_Timer
 {
 	public:
-		Publish_Timer(ros::Publisher& _pub, array3d& _a, double _t)
+		Publish_Timer(ros::NodeHandle& _nh, array3d& _a, double _t)
 		{
-			pub = _pub;
+			pub = _nh.advertise<std_msgs::Float64MultiArray>("/yantra/yantra_arm_controller/command", 1);
 			coeff_a = _a;
 			end_time = _t - 1;
 		}
@@ -192,7 +192,7 @@ int main(int argc, char** argv)
 	//std::vector<double> time = {0, 0.10, 0.23, 0.50, 0.76, 1.0};
 
 	double q_init[] = {M_PI/4, 0, 0, 0, 0};
-	double pos[passing_points][3] = {{190, 180, 200} , {210, 220, 200}, {240, 240, 250} , {300, 300, 300}};
+	double pos[passing_points][3] = {{100, 0, 50} , {50, 50, 90}, {100, 40, 150} , {50, -50, 60}};
 	double q_j_value[passing_points][5];
 	double q_j_velocity[passing_points][5] = {0};
 	double q_j_accel[passing_points][5] = {0};
@@ -201,6 +201,10 @@ int main(int argc, char** argv)
 	array3d coeff_a;
 	array2d vis_point;		//Final position point calculated from direct kinematics to visualise on a plot
 
+
+	/*
+ 	 * Applying Inverse Kinematics to path points 
+ 	 */
 	for (int i=0; i<passing_points; i++)
 	{
 		int err = -5;
@@ -211,7 +215,9 @@ int main(int argc, char** argv)
 		}
 	}
 
-	//Just Printing the values the Joint Angles for 6 points
+	/*
+	 * Just Printing the values the Joint Angles for 6 points
+	 */
 	std::cout << "Printing values of joint angles for given points" << std::endl;
 	for(int i=0; i<passing_points; i++) {
 		for(int j=0; j<5; j++) {
@@ -220,7 +226,25 @@ int main(int argc, char** argv)
 		std::cout << std::endl;
 	}
 
-	
+
+	/*
+ 	 * Commanding Arm to go the first path-point from where the velocity controller will start
+ 	 */
+	std::vector<double> home_pos(q_j_value[0], q_j_value[0]+sizeof(q_j_value[0])/sizeof(q_j_value[0][0]));
+	std_msgs::Float64MultiArray home_pos_pub_msg;
+	home_pos_pub_msg.data = home_pos;
+	pub_jointvalue.publish(home_pos_pub_msg);
+			
+	char ans;
+	std::cout << "Is Home Position set?" << std::endl;
+	std::cin >> ans;
+
+
+
+
+	/*
+ 	 * Generating Trajectory. Specifically calculating the path-segment coefficients
+ 	 */
 	for(int i=0; i<passing_points; i++)
 	{
 		waypoint_joint_space[i] = make_JointValues(&q_j_value[i][0], &q_j_velocity[i][0], &q_j_accel[i][0]);
@@ -256,7 +280,7 @@ int main(int argc, char** argv)
 	*/
 	//double one_pt = (coeff_a[i][0][0]*(std::pow(t,3)))+(coeff_a[i][0][1]*(std::pow(t,2)))+(coeff_a[i][0][2]*(t))+(coeff_a[i][0][3]);
 	
-	Publish_Timer _timer(pub_jointvalue, coeff_a, time.at(time.size()-1));
+	Publish_Timer _timer(node, coeff_a, time.at(time.size()-1));
 	_timer.start(node);			//Timer will stop automatically whwn time_count has reached 24 (sec) 
 	std::cout << "Timer should start";
 	ros::spin();
