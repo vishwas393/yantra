@@ -31,7 +31,7 @@ class Publish_Timer
 		Publish_Timer(ros::NodeHandle& _nh, array3d& _a, double _t)
 		{
 			coeff_a = _a;
-			end_time = _t - 1;
+			end_time = _t - time_step;
 
 			pub_joint1value = _nh.advertise<std_msgs::Float64>("/yantra/link_one_vel_controller/command", 1);
 			pub_joint2value = _nh.advertise<std_msgs::Float64>("/yantra/link_two_vel_controller/command", 1);
@@ -44,44 +44,46 @@ class Publish_Timer
 
 		void callback(const ros::TimerEvent& event)
 		{
-			std::cout << "Callback called!" << std::endl;
-			int path_seg = static_cast<int>(time_count) / 3;
-			jvalpub.at(0) = (3*coeff_a[0][path_seg][0]*(std::pow(time_count,2)))+(2*coeff_a[0][path_seg][1]*time_count)+(coeff_a[0][path_seg][2]);
-			jvalpub.at(1) = (3*coeff_a[1][path_seg][0]*(std::pow(time_count,2)))+(2*coeff_a[1][path_seg][1]*time_count)+(coeff_a[1][path_seg][2]);
-			jvalpub.at(2) = (3*coeff_a[2][path_seg][0]*(std::pow(time_count,2)))+(2*coeff_a[2][path_seg][1]*time_count)+(coeff_a[2][path_seg][2]);
-			jvalpub.at(3) = (3*coeff_a[3][path_seg][0]*(std::pow(time_count,2)))+(2*coeff_a[3][path_seg][1]*time_count)+(coeff_a[3][path_seg][2]);
-			jvalpub.at(4) = (3*coeff_a[4][path_seg][0]*(std::pow(time_count,2)))+(2*coeff_a[4][path_seg][1]*time_count)+(coeff_a[4][path_seg][2]);
-
-			pub_1msg.data = jvalpub.at(0);
-			pub_2msg.data = jvalpub.at(1);
-			pub_3msg.data = jvalpub.at(2);
-			pub_4msg.data = jvalpub.at(3);
-			pub_5msg.data = jvalpub.at(4);
-			pub_joint1value.publish(pub_1msg);
-			pub_joint2value.publish(pub_2msg);
-			pub_joint3value.publish(pub_3msg);
-			pub_joint4value.publish(pub_4msg);
-			pub_joint5value.publish(pub_5msg);
-
-			if(time_count == end_time) {
+			ROS_INFO_STREAM("end time is " << end_time << "  and time_count is " << time_count);
+			
+			if(static_cast<double>(time_count) == static_cast<double>(end_time)) {
 				stop();
 			}
 			else {
-				time_count += 0.5;
-				ROS_INFO_STREAM("Point number: " << time_count);
-			}
+				int path_seg = static_cast<int>(time_count) / 2;
+				ROS_INFO_STREAM("path_seg is: " << path_seg);
+				jvalpub.at(0) = (3*coeff_a[0][path_seg][0]*(std::pow(time_count,2)))+(2*coeff_a[0][path_seg][1]*time_count)+(coeff_a[0][path_seg][2]);
+				jvalpub.at(1) = (3*coeff_a[1][path_seg][0]*(std::pow(time_count,2)))+(2*coeff_a[1][path_seg][1]*time_count)+(coeff_a[1][path_seg][2]);
+				jvalpub.at(2) = (3*coeff_a[2][path_seg][0]*(std::pow(time_count,2)))+(2*coeff_a[2][path_seg][1]*time_count)+(coeff_a[2][path_seg][2]);
+				jvalpub.at(3) = (3*coeff_a[3][path_seg][0]*(std::pow(time_count,2)))+(2*coeff_a[3][path_seg][1]*time_count)+(coeff_a[3][path_seg][2]);
+				jvalpub.at(4) = (3*coeff_a[4][path_seg][0]*(std::pow(time_count,2)))+(2*coeff_a[4][path_seg][1]*time_count)+(coeff_a[4][path_seg][2]);
 
+				pub_1msg.data = jvalpub.at(0);
+				pub_2msg.data = jvalpub.at(1);
+				pub_3msg.data = jvalpub.at(2);
+				pub_4msg.data = jvalpub.at(3);
+				pub_5msg.data = jvalpub.at(4);
+				pub_joint1value.publish(pub_1msg);
+				pub_joint2value.publish(pub_2msg);
+				pub_joint3value.publish(pub_3msg);
+				pub_joint4value.publish(pub_4msg);
+				pub_joint5value.publish(pub_5msg);
+
+				ROS_INFO_STREAM("Point number: " << time_count);
+				time_count += time_step;
+				ROS_INFO_STREAM("time_count becomes" << time_count);
+			}
 		}	
 
 		void start(ros::NodeHandle& _nh)
 		{
-			timer = _nh.createTimer(ros::Duration(0.5), &Publish_Timer::callback, this);\
+			timer = _nh.createTimer(ros::Duration(time_step), &Publish_Timer::callback, this);\
 			std::cout << "Timer started!" << std::endl;
 		}
 
 		void stop()
 		{
-			std::cout << "Timer stops now" << std::endl;
+			ROS_INFO_STREAM("Timer stops now");
 
 			pub_1msg.data = 0;
 			pub_2msg.data = 0;
@@ -99,6 +101,7 @@ class Publish_Timer
 
 	private:
 		double time_count = 0;
+		double time_step = 0.2;
 		//ros::Publisher pub;
 		ros::Timer timer;
 		array3d coeff_a;
@@ -254,12 +257,12 @@ int main(int argc, char** argv)
 	std::vector<std::string> vel_controller	({"link_one_vel_controller","link_two_vel_controller","link_three_vel_controller","link_four_vel_controller","link_five_vel_controller"}); 
 	
 
-	std::vector<double> time = {0, 3, 6, 9, 12, 15};
+	std::vector<double> time = {0.0, 2.0, 4.0, 6.0, 8.0,10.0};
 
 	//std::vector<double> time = {0, 0.10, 0.23, 0.50, 0.76, 1.0};
 
 	double q_init[] = {M_PI/4, 0, 0, 0, 0};
-	double pos[passing_points][3] = {{190, 180, 280} , {190, 180, 260}, {190, 180, 240} , {190, 180, 200}};
+	double pos[passing_points][3] = {{100, 0, 50} , {50, 50, 100}, {90, 10, 200} , {50, -80, 100}};
 	double q_j_value[passing_points][5];
 	double q_j_velocity[passing_points][5] = {0};
 	double q_j_accel[passing_points][5] = {0};
