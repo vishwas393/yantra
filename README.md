@@ -14,12 +14,12 @@ The project mainly consists of three nodes.
         *   position in 3D space (an array with 3 elements - X, Y, Z value)
     - **`response : `**
         *   Joint values (array of calculated joint position, velocity and accelaration for each joint)
+	<br/>
 
-<br/>
 3. **Trajectory Generator node**: This node performs the cubic polynomial joint trajectory. The equation for joint angles is as shown in the below given equation. The equation can also be understood from the image given below. The coefficient of the equation is then used to calculate the velocity. <br/>
-       q~i,k~(t) = a~i,k,3~t^3^ + a~i,k,2~t^2^ + a~i,k,1~t^1^ + a~i,k,0~ <br/>
-            -- i : i^th^ joint of the arm (total 5)
-            -- k : k^th^ path segment (total 5. 4 user-defined path-points and 2 virtual points for continuity upto acceleration).
+       q<sub>i,k</sub>(t) = a<sub>i,k,3</sub>t<sup>3</sup> + a<sub>i,k,2</sub>t<sup>2</sup> + a<sub>i,k,1</sub>t<sup>1</sup> + a<sub>i,k,0</sub> <br/>
+       - i : i<sup>th</sup> joint of the arm (total 5)
+       - k : k<sup>th</sup> path segment (total 5. 4 user-defined path-points and 2 virtual points for continuity upto acceleration).
 
 ![Traj Eq](https://github.com/vishwas393/yantra/blob/controller_switching/misc/trajectory_image.png?raw=true "trajectory_equation")
 
