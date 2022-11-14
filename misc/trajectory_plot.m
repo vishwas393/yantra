@@ -53,7 +53,7 @@ for t = 0:0.1:9.9
 end
 
 %%
-cl = ['r','g','b','c','m'];
+cl = ['r','g','b','y','m'];
 c = 1;
 for i=1:1:99
     if floor(i/20) ~= floor((i-1)/20)
