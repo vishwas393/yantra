@@ -23,9 +23,11 @@ The project mainly consists of three nodes.
 
 ![Traj Eq](https://github.com/vishwas393/yantra/blob/controller_switching/misc/trajectory_image.png?raw=true "trajectory_equation")
 
-The output of the trajectory planner is visualised in MATLAB (matlab file in `misc` directory) and the whole application is visualised in the Gazebo. The output of MATLAB is attached below. Find the video of whole application [here]. 
+The output of the trajectory planner is visualised in MATLAB (matlab file in `misc` directory) and the whole application is visualised in the Gazebo. The output of MATLAB is attached below as well as a short GIF. Find the video of whole application [here].(not uploaded yet) 
 
 ![MATLAB Plot](https://github.com/vishwas393/yantra/blob/controller_switching/misc/eepos_matlab_plot.jpg?raw=true "matlabplot")
+
+![Movement GIF](https://github.com/vishwas393/yantra/blob/controller_switching/misc/movement.gif?raw=true "movement_gif")
 
 [ROS controller]: http://wiki.ros.org/ros_control#Controllers
 [here]: www.youtube.com
