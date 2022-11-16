@@ -69,12 +69,21 @@ def end_effector_position(d):
     d3 = d[2]
     d4 = d[3]
     d5 = d[4]
+    d6 = d[5]
 
-    t1 = 56.0*cos(d1) - 56.0*cos(d3)*(- 1.0*cos(d1)*cos(d2)) + 56.0*sin(d5)*(- 1.0*sin(d3)*(- 1.0*cos(d1)*cos(d2)) + cos(d3)*(cos(d1)*sin(d2))) - 56.0*cos(d5)*(cos(d4)*(cos(d3)*(- 1.0*cos(d1)*cos(d2)) + sin(d3)*(cos(d1)*sin(d2))) - 1.0*sin(d4)*(sin(d1))) - 170.0*sin(d3)*(- 1.0*cos(d1)*cos(d2)) + 170.0*cos(d3)*(cos(d1)*sin(d2)) - 56.0*sin(d3)*(cos(d1)*sin(d2)) + 200.0*cos(d1)*cos(d2)
+    t1 = 56*cos(d1) + 70*sin(d4)*(cos(d1)*cos(d2)*cos(d3) - cos(d1)*sin(d2)*sin(d3)) + 56*sin(d5)*(cos(d1)*cos(d2)*sin(d3) + cos(d1)*cos(d3)*sin(d2)) + 56*cos(d5)*(sin(d1)*sin(d4) + cos(d4)*(cos(d1)*cos(d2)*cos(d3) - cos(d1)*sin(d2)*sin(d3))) + 205*cos(d1)*cos(d2) - 70*cos(d4)*sin(d1) + 56*cos(d1)*cos(d2)*cos(d3) + 167*cos(d1)*cos(d2)*sin(d3) + 167*cos(d1)*cos(d3)*sin(d2) - 56*cos(d1)*sin(d2)*sin(d3)
 
-    t2 = 56.0*sin(d1) - 56.0*sin(d5)*(- 1.0*cos(d3)*(sin(d1)*sin(d2)) - 1.0*sin(d3)*(cos(d2)*sin(d1))) + 56.0*cos(d5)*(cos(d4)*(cos(d3)*(cos(d2)*sin(d1)) - 1.0*sin(d3)*(sin(d1)*sin(d2))) - 1.0*sin(d4)*(cos(d1))) + 170.0*cos(d3)*(sin(d1)*sin(d2)) + 56.0*cos(d3)*(cos(d2)*sin(d1)) - 56.0*sin(d3)*(sin(d1)*sin(d2)) + 170.0*sin(d3)*(cos(d2)*sin(d1)) + 200.0*cos(d2)*sin(d1)
+    t2 = 56*sin(d1) + 70*sin(d4)*(cos(d2)*cos(d3)*sin(d1) - sin(d1)*sin(d2)*sin(d3)) + 56*sin(d5)*(cos(d2)*sin(d1)*sin(d3) + cos(d3)*sin(d1)*sin(d2)) + 56*cos(d5)*(cos(d4)*(cos(d2)*cos(d3)*sin(d1) - sin(d1)*sin(d2)*sin(d3)) - cos(d1)*sin(d4)) + 70*cos(d1)*cos(d4) + 205*cos(d2)*sin(d1) + 56*cos(d2)*cos(d3)*sin(d1) + 167*cos(d2)*sin(d1)*sin(d3) + 167*cos(d3)*sin(d1)*sin(d2) - 56*sin(d1)*sin(d2)*sin(d3)
+    
+    t3 = 205*sin(d2) + 167*sin(d2)*sin(d3) + 70*sin(d4)*(cos(d2)*sin(d3) + cos(d3)*sin(d2)) + 56*sin(d5)*(sin(d2)*sin(d3) - cos(d2)*cos(d3)) - 167*cos(d2)*cos(d3) + 56*cos(d2)*sin(d3) + 56*cos(d3)*sin(d2) + 56*cos(d4)*cos(d5)*(cos(d2)*sin(d3) + cos(d3)*sin(d2)) + 283
 
-    t3 = 200.0*sin(d2) + 170.0*sin(d2)*sin(d3) + 56.0*cos(d5)*(cos(d4)*(cos(d2)*sin(d3) + cos(d3)*sin(d2))) + 56.0*sin(d5)*(sin(d2)*sin(d3) - 1.0*cos(d2)*cos(d3)) - 170.0*cos(d2)*cos(d3) + 56.0*cos(d2)*sin(d3) + 56.0*cos(d3)*sin(d2) + 280.0
 
     return np.array([t1, t2, t3]).reshape(3,1)
 
+
+def main():
+	dd = [0, 0, 0, 0, 0, 0]
+	p = end_effector_position(dd)
+	print(p)
+	
+main()
