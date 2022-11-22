@@ -1,0 +1,94 @@
+J_x_d1 =
+ 
+291*sin(d1)*sin(d3)*sin(d2 + pi/2) - 291*cos(d3)*cos(d2 + pi/2)*sin(d1) - 205*cos(d2 + pi/2)*sin(d1)
+
+
+ 
+ 
+J_x_d2 =
+ 
+- 205*cos(d1)*sin(d2 + pi/2) - 291*cos(d1)*cos(d3)*sin(d2 + pi/2) - 291*cos(d1)*cos(d2 + pi/2)*sin(d3)
+ 
+ 
+J_x_d3 =
+ 
+- 291*cos(d1)*cos(d3)*sin(d2 + pi/2) - 291*cos(d1)*cos(d2 + pi/2)*sin(d3) 
+ 
+J_x_d4 =
+ 
+0
+ 
+ 
+J_x_d5 =
+ 
+0
+ 
+ 
+J_x_d6 =
+ 
+0
+ 
+ 
+J_y_d1 =
+ 
+205*cos(d1)*cos(d2 + pi/2) + 291*cos(d1)*cos(d3)*cos(d2 + pi/2) - 291*cos(d1)*sin(d3)*sin(d2 + pi/2)
+
+ 
+ 
+J_y_d2 =
+ 
+- 205*sin(d1)*sin(d2 + pi/2) - 291*cos(d3)*sin(d1)*sin(d2 + pi/2) - 291*cos(d2 + pi/2)*sin(d1)*sin(d3)
+
+ 
+ 
+J_y_d3 =
+ 
+- 291*cos(d3)*sin(d1)*sin(d2 + pi/2) - 291*cos(d2 + pi/2)*sin(d1)*sin(d3)
+
+ 
+ 
+J_y_d4 =
+ 
+0
+ 
+ 
+J_y_d5 =
+ 
+0
+ 
+ 
+J_y_d6 =
+ 
+0
+ 
+ 
+J_z_d1 =
+ 
+0
+ 
+ 
+J_z_d2 =
+ 
+205*cos(d2 + pi/2) - 291*sin(d3)*sin(d2 + pi/2) + 291*cos(d3)*cos(d2 + pi/2)
+
+ 
+ 
+J_z_d3 =
+ 
+291*cos(d3)*cos(d2 + pi/2) - 291*sin(d3)*sin(d2 + pi/2)
+
+ 
+ 
+J_z_d4 =
+ 
+0
+ 
+ 
+J_z_d5 =
+ 
+0
+ 
+ 
+J_z_d6 =
+ 
+0

@@ -14,6 +14,7 @@ def callback_fn(req):
     cnt = 0
     qt = req.Q_init
     q = np.array(qt.j_value).reshape(5,1)
+    #print(req.P)
     K = (10**-6)*(np.eye(3))
     while (err != 0):
 
@@ -38,7 +39,7 @@ def callback_fn(req):
     
     print("Iterations: " + str(cnt))
     ret = JointValues()
-    ret.j_value = qn
+    ret.j_value = q
     return InverseKinematicsResponse(ret)
 
         

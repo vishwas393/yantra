@@ -1,4 +1,5 @@
 #include "ros/ros.h"
+#include "ros/console.h"
 #include "yantra/Position.h"
 #include "yantra/PathCoefficient_1d.h"
 #include "yantra/PathCoefficient_2d.h"
@@ -18,9 +19,6 @@ int passing_points = 4;
 
 typedef std::vector<std::vector<double>> array2d;
 typedef std::vector<std::vector<std::vector<double>>> array3d;
-
-
-#include <ros/console.h>
 
 
 
@@ -46,7 +44,7 @@ class Publish_Timer
 		{
 			ROS_INFO_STREAM("end time is " << end_time << "  and time_count is " << time_count);
 			
-			if(static_cast<double>(time_count) == static_cast<double>(end_time)) {
+			if(time_count == end_time) {
 				stop();
 			}
 			else {
@@ -77,7 +75,7 @@ class Publish_Timer
 
 		void start(ros::NodeHandle& _nh)
 		{
-			timer = _nh.createTimer(ros::Duration(time_step), &Publish_Timer::callback, this);\
+			timer = _nh.createTimer(ros::Duration(time_step), &Publish_Timer::callback, this);
 			std::cout << "Timer started!" << std::endl;
 		}
 
@@ -102,7 +100,6 @@ class Publish_Timer
 	private:
 		double time_count = 0;
 		double time_step = 0.2;
-		//ros::Publisher pub;
 		ros::Timer timer;
 		array3d coeff_a;
 		double end_time;
@@ -198,7 +195,6 @@ int trajectory_generator(ros::ServiceClient *cl, yantra::JointValues *q, std::ve
 		srv.request.Q.push_back(tmp_j);
 	}
 
-	//std::vector<double> time = {0, 1.2, 2.34, 5.56, 7.56, 10};
 
 	srv.request.T = time;
 
@@ -237,9 +233,6 @@ int main(int argc, char** argv)
 	ros::NodeHandle node;
 
 
-
-
-
 	ros::ServiceClient client_CC = node.serviceClient<controller_manager_msgs::SwitchController>("/yantra/controller_manager/switch_controller");	//CC = Controller change
 	ros::ServiceClient client_IK = node.serviceClient<yantra::InverseKinematics>("inverse_kinematics_server");	//IK = Inverse Kinematics
 	ros::ServiceClient client_TG = node.serviceClient<yantra::TrajectoryGenerator>("trajectory_generator_server");	//TG = Trajectory Generator
@@ -259,9 +252,8 @@ int main(int argc, char** argv)
 
 	std::vector<double> time = {0.0, 2.0, 4.0, 6.0, 8.0,10.0};
 
-	//std::vector<double> time = {0, 0.10, 0.23, 0.50, 0.76, 1.0};
 
-	double q_init[] = {M_PI/4, 0, 0, 0, 0};
+	double q_init[] = {0, 0, 0, 0, 0};
 	double pos[passing_points][3] = {{100, 0, 50} , {50, 50, 100}, {90, 10, 200} , {50, -80, 100}};
 	double q_j_value[passing_points][5];
 	double q_j_velocity[passing_points][5] = {0};
@@ -269,7 +261,6 @@ int main(int argc, char** argv)
 	double trajcoeffs[passing_points-1][5];
 	yantra::JointValues waypoint_joint_space[passing_points];
 	array3d coeff_a;
-	array2d vis_point;		//Final position point calculated from direct kinematics to visualise on a plot
 
 	
 
@@ -373,7 +364,6 @@ int main(int argc, char** argv)
 			_timer.start(node);			//Timer will stop automatically whwn time_count has reached end time (sec) 
 	}
 	
-	std::cout << "Timer should start" << std::endl;
 	ros::spin();
 }
 
