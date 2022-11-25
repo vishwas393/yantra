@@ -44,7 +44,8 @@ class Publish_Timer
 		{
 			ROS_INFO_STREAM("end time is " << end_time << "  and time_count is " << time_count);
 			
-			if(time_count == end_time) {
+			if((floorf(time_count*10)/10) == (floorf(end_time*10)/10))				// To comapre exactly one digit after decimal point 
+			{
 				stop();
 			}
 			else {
