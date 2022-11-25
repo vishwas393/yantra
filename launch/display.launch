@@ -9,10 +9,11 @@
 		<arg name="model" value="$(arg model)"/>
 	</include>
 
-
+	
 	<rosparam command="load" file="$(find yantra)/config/yantra_controller.yaml"/>
 	<rosparam command="load" file="$(find yantra)/config/controller_groups.yaml"/>
 	
+
 	<node name="yantra_arm_controller_spawner" pkg="controller_manager" type="spawner" 
 			ns="/yantra" args=  "yantra_arm_controller "/> 
 

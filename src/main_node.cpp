@@ -254,7 +254,7 @@ int main(int argc, char** argv)
 
 
 	double q_init[] = {0, 0, 0, 0, 0};
-	double pos[passing_points][3] = {{100, 0, 50} , {50, 50, 100}, {90, 10, 200} , {50, -80, 100}};
+	double pos[passing_points][3] = {{300, 0, 300} , {200, 200, 450}, {-100, 200, 500} , {-300, -100, 300}};
 	double q_j_value[passing_points][5];
 	double q_j_velocity[passing_points][5] = {0};
 	double q_j_accel[passing_points][5] = {0};
