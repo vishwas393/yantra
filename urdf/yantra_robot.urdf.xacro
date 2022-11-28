@@ -89,7 +89,7 @@
 			<child link="link_${clink}"/>
 			<origin xyz="${x} ${y} ${z}" rpy="${rr} ${pp} ${yy}"/>
 			<axis xyz="${rx} ${ry} ${rz}"/>
-			<limit effort="${efrt}"  upper="100" lower="100" velocity="2000"/>
+			<limit effort="${efrt}"  upper="100" lower="100" velocity="20000000"/>
 		</joint>
 		</xacro:if>
 	</xacro:macro>
@@ -151,7 +151,7 @@
 	<xacro:link i="52" r="${pi/2}" p="0" y="${h52/2 - r51}" x="0" z="0" m="${m52}" rad="${r52}" ht="${h52}" rot_axis="n"/>
 
 
-	<xacro:link_joints plink="0" clink="1" x="0" y="0" z="${h0}" rr="0" pp="0" yy="0" jtype="r" rx="0" ry="0" rz="1" efrt="10"/>
+	<xacro:link_joints plink="0" clink="1" x="0" y="0" z="${h0}" rr="0" pp="0" yy="0" jtype="r" rx="0" ry="0" rz="1" efrt="100"/>
 	<xacro:link_joints plink="1" clink="2" x="0" y="0" z="${h1}" rr="${pi/2}" pp="0" yy="0" jtype="r" rx="0" ry="0" rz="1" efrt="500"/>
 	<xacro:link_joints plink="2" clink="3" x="0" y="${h2}" z="0" rr="0" pp="0" yy="${pi/2}" jtype="r" rx="0" ry="0" rz="1" efrt="300"/>
 	<xacro:link_joints plink="3" clink="4" x="${h3}" y="0" z="0" rr="${pi/2}" pp="0" yy="${pi/2}" jtype="r" rx="0" ry="0" rz="1" efrt="10"/>

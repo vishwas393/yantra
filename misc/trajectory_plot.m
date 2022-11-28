@@ -45,6 +45,7 @@ coeff(5, :, :) = coeff_j5;
 
 cnt = 1;
 positions = zeros(100, 3);
+velocities = zeros(100, 5);
 for t = 0:0.1:9.9
     path_seg = floor((floor(t))/2) + 1 ;
     q1 = coeff(1,path_seg,1)*t^3 + coeff(1,path_seg,2)*t^2 + coeff(1,path_seg,3)*t + coeff(1,path_seg,4);
@@ -52,8 +53,15 @@ for t = 0:0.1:9.9
     q3 = coeff(3,path_seg,1)*t^3 + coeff(3,path_seg,2)*t^2 + coeff(3,path_seg,3)*t + coeff(3,path_seg,4);
     q4 = coeff(4,path_seg,1)*t^3 + coeff(4,path_seg,2)*t^2 + coeff(4,path_seg,3)*t + coeff(4,path_seg,4);
     q5 = coeff(5,path_seg,1)*t^3 + coeff(5,path_seg,2)*t^2 + coeff(5,path_seg,3)*t + coeff(5,path_seg,4);
+
+    v1 = 3*coeff(1,path_seg,1)*t^2 + 2*coeff(1,path_seg,2)*t + coeff(1,path_seg,3);
+    v2 = 3*coeff(2,path_seg,1)*t^2 + 2*coeff(2,path_seg,2)*t + coeff(2,path_seg,3);
+    v3 = 3*coeff(3,path_seg,1)*t^2 + 2*coeff(3,path_seg,2)*t + coeff(3,path_seg,3);
+    v4 = 3*coeff(4,path_seg,1)*t^2 + 2*coeff(4,path_seg,2)*t + coeff(4,path_seg,3);
+    v5 = 3*coeff(5,path_seg,1)*t^2 + 2*coeff(5,path_seg,2)*t + coeff(5,path_seg,3);
  
     positions(cnt, :) = end_effector_position(q1, q2, q3, q4, q5);
+    velocities(cnt, :) = [v1, v2, v3, v4, v5];
     cnt = cnt + 1;
 end
 

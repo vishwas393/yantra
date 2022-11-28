@@ -64,6 +64,7 @@ add_service_files(
   FILES
   InverseKinematics.srv
   TrajectoryGenerator.srv
+  PathPointsGui.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -135,9 +136,9 @@ add_executable(main_node src/main_node.cpp)
 add_dependencies(main_node ${${PROJECT_NAME}_EXPORTED_TARGET} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(main_node ${catkin_LIBRARIES})
 
-add_executable(trajectory_generator_service src/trajectory_generator_service.cpp)
-add_dependencies(trajectory_generator_service ${${PROJECT_NAME}_EXPORTED_TARGET} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(trajectory_generator_service ${catkin_LIBRARIES})
+add_executable(trajectory_cont_accel_generator_service src/trajectory_cont_accel_generator_service.cpp)
+add_dependencies(trajectory_cont_accel_generator_service ${${PROJECT_NAME}_EXPORTED_TARGET} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(trajectory_cont_accel_generator_service ${catkin_LIBRARIES})
 
 add_executable(pid_param_mapping src/test/pid_param_mapping.cpp)
 add_dependencies(pid_param_mapping ${${PROJECT_NAME}_EXPORTED_TARGET} ${catkin_EXPORTED_TARGETS})
@@ -184,12 +185,13 @@ target_link_libraries(pid_param_mapping ${catkin_LIBRARIES})
 catkin_install_python(PROGRAMS
   src/inverse_kinematics_service.py
   lib/yantra/predefined_matrices.py
+  src/yantra_gui.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-install(TARGETS main_node trajectory_generator_service pid_param_mapping
+install(TARGETS main_node trajectory_cont_accel_generator_service pid_param_mapping
 		RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

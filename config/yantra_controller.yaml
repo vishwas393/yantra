@@ -68,7 +68,7 @@
   link_one_vel_controller:
     type: effort_controllers/JointVelocityController
     joint: joint_0_1
-    pid: {p: 50.0, i: 0.1, d: 1.0, i_clamp_min: -0.0, i_clamp_max: 0.0}
+    pid: {p: 250.0, i: 0.1, d: 1.0, i_clamp_min: -0.0, i_clamp_max: 0.0}
 
   link_two_vel_controller:
     type: effort_controllers/JointVelocityController

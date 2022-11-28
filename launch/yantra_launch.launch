@@ -1,9 +1,11 @@
 <?xml version="1.0"?>
 <launch>
 
-	<node name="IK_server" pkg="yantra" type="inverse_kinematics_service.py"/>
-	<node name="trajectory_generator_server" pkg="yantra" type="trajectory_generator_service"/>
 	<include file="$(find yantra)/launch/display.launch"/>	
+	<node name="IK_server" pkg="yantra" type="inverse_kinematics_service.py"/>
+	<node name="trajectory_generator_server" pkg="yantra" type="trajectory_cont_accel_generator_service"/>
+	<node name="GUI" pkg="yantra" type="yantra_gui.py"/>
+
 	<!--node name="main_node" pkg="yantra" type="main_node"/-->
 </launch>
 
