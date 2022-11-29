@@ -32,8 +32,10 @@ class Publish_Timer
 			coeff_a = _a;
 			time = _t;
 			time_len = time.size();
-			end_time = time.at(time_len -1) - time_step;
+			end_time = time.at(time_len -1) + time_step;
+			time_count = time.at(0) + time_step;
 
+			ROS_INFO_STREAM("end_time is : " << end_time);
 			pub_joint1value = _nh.advertise<std_msgs::Float64>("/yantra/link_one_vel_controller/command", 5);
 			pub_joint2value = _nh.advertise<std_msgs::Float64>("/yantra/link_two_vel_controller/command", 5);
 			pub_joint3value = _nh.advertise<std_msgs::Float64>("/yantra/link_three_vel_controller/command", 5);
@@ -52,21 +54,22 @@ class Publish_Timer
 				stop();
 			}
 			else {
-				path_seg = static_cast<int>(time_count) / 2;
+				//path_seg = static_cast<int>(time_count) / 2;
 
-				/*
 				idx_c = std::find(time.begin(), time.end(), static_cast<int>(time_count)) - time.begin();
-				if(idx_c != time_len) {
+				if(idx_c != time_len && idx_c != time.size()-1) {
 					path_seg = idx_c;
-				}*/
+				}
+				
+				// Here coeff_a[..][..][a0 a1 a2 a3] --> a0 + a1*t + ...
 
-				ROS_INFO_STREAM("path_seg is: " << path_seg);
-				jvalpub.at(0) = (3*coeff_a[0][path_seg][0]*(std::pow(time_count,2)))+(2*coeff_a[0][path_seg][1]*time_count)+(coeff_a[0][path_seg][2]);
-				jvalpub.at(1) = (3*coeff_a[1][path_seg][0]*(std::pow(time_count,2)))+(2*coeff_a[1][path_seg][1]*time_count)+(coeff_a[1][path_seg][2]);
-				jvalpub.at(2) = (3*coeff_a[2][path_seg][0]*(std::pow(time_count,2)))+(2*coeff_a[2][path_seg][1]*time_count)+(coeff_a[2][path_seg][2]);
-				jvalpub.at(3) = (3*coeff_a[3][path_seg][0]*(std::pow(time_count,2)))+(2*coeff_a[3][path_seg][1]*time_count)+(coeff_a[3][path_seg][2]);
-				jvalpub.at(4) = (3*coeff_a[4][path_seg][0]*(std::pow(time_count,2)))+(2*coeff_a[4][path_seg][1]*time_count)+(coeff_a[4][path_seg][2]);
-
+				ROS_INFO_STREAM("path_seg is: " << path_seg << "  time_count is: " << time_count);
+				jvalpub.at(0) = (3*coeff_a[0][path_seg][3]*(std::pow(time_count,2)))+(2*coeff_a[0][path_seg][2]*time_count)+(coeff_a[0][path_seg][1]);
+				jvalpub.at(1) = (3*coeff_a[1][path_seg][3]*(std::pow(time_count,2)))+(2*coeff_a[1][path_seg][2]*time_count)+(coeff_a[1][path_seg][1]);
+				jvalpub.at(2) = (3*coeff_a[2][path_seg][3]*(std::pow(time_count,2)))+(2*coeff_a[2][path_seg][2]*time_count)+(coeff_a[2][path_seg][1]);
+				jvalpub.at(3) = (3*coeff_a[3][path_seg][3]*(std::pow(time_count,2)))+(2*coeff_a[3][path_seg][2]*time_count)+(coeff_a[3][path_seg][1]);
+				jvalpub.at(4) = (3*coeff_a[4][path_seg][3]*(std::pow(time_count,2)))+(2*coeff_a[4][path_seg][2]*time_count)+(coeff_a[4][path_seg][1]);
+				ROS_INFO_STREAM(jvalpub.at(0) << " , " <<  jvalpub.at(1) << " , " <<  jvalpub.at(2) << " , " <<  jvalpub.at(3) << " , " << jvalpub.at(4) << " , ");
 				pub_1msg.data = jvalpub.at(0);
 				pub_2msg.data = jvalpub.at(1);
 				pub_3msg.data = jvalpub.at(2);
@@ -113,8 +116,8 @@ class Publish_Timer
 		}
 
 	private:
-		double time_count = 0;
-		double time_step = 0.2;
+		double time_count = 2;
+		double time_step = 0.1;
 		double end_time = 0;
 		int time_len = 0;
 		int path_seg = 0;
@@ -217,23 +220,24 @@ int trajectory_generator(ros::ServiceClient *cl, yantra::JointValues *q, std::ve
 
 
 	srv.request.T = time;
-
+	ROS_INFO("Calling Trajectory Server");
 	if(cl->call(srv))
 	{
+		ROS_INFO("trajectory_generator_server call successful");
 		for(int i=0; i<5; i++) {
-			//std::cout << "Trajectory Coefficient for joint " << i << ":" << std::endl;
+			std::cout << "Trajectory Coefficient for joint " << i << ":" << std::endl;
 			array2d tmp1;
-			for(int j=0; j<5; j++) {
+			for(int j=0; j<3; j++) {
 				std::vector<double> tmp;
 				for(int k=0; k<4; k++) {
-					//std::cout << srv.response.a_qi[i].a_pi[j].a[k] << " | ";
+					std::cout << srv.response.a_qi[i].a_pi[j].a[k] << " | ";
 					tmp.push_back(srv.response.a_qi[i].a_pi[j].a[k]);
 				}
 				tmp1.push_back(tmp);
-				//std::cout << std::endl;
+				std::cout << std::endl;
 			}
 			a.push_back(tmp1);
-			//std::cout<<std::endl;
+			std::cout<<std::endl;
 		}
 	}
 	else
@@ -288,7 +292,8 @@ int main(int argc, char** argv)
 	client_TG.waitForExistence(wait_time_server);
 	client_CC.waitForExistence(wait_time_server);
 	client_PG.waitForExistence(wait_time_server);
-	
+
+	ROS_INFO("All services are online!");
 
 	controller_manager_msgs::SwitchController controller_change_srv;
 	std::vector<std::string> pos_controller	({"yantra_arm_controller"});
@@ -338,33 +343,27 @@ int main(int argc, char** argv)
 	 */
 	std::cout << "Printing values of joint angles for given points" << std::endl;
 	for(int i=0; i<passing_points; i++) {
-		for(int j=0; j<3; j++) {
-			std::cout << pos[i][j] << " , ";
+		for(int j=0; j<5; j++) {
+			std::cout << q_j_value[i][j] << " , ";
 		}
 		std::cout << std::endl;
 	}
-
-	for(int i=0; i<time.size(); i++) {
-		std::cout << time.at(i) << ", ";
-	}
-	std::cout << std::endl;
-
 
 
 
 	/*
 	 * Commanding Arm to go the first path-point from where the velocity controller will start
 	 */
-	std::vector<double> home_pos(q_j_value[0], q_j_value[0]+sizeof(q_j_value[0])/sizeof(q_j_value[0][0]));
+	std::vector<double> home_pos1(q_j_value[0], q_j_value[0]+sizeof(q_j_value[0])/sizeof(q_j_value[0][0]));
 	std_msgs::Float64MultiArray home_pos_pub_msg;
-	home_pos_pub_msg.data = home_pos;
+	home_pos_pub_msg.data = home_pos1;
 	pub_jointvalue.publish(home_pos_pub_msg);
 	
 	char ans;
 	std::cout << "Is Home Position set?" << std::endl;
 	std::cin >> ans;
 
-
+	
 	/*
 	 * Generating Trajectory. Specifically calculating the path-segment coefficients
 	 */

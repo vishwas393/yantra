@@ -419,19 +419,19 @@ class Ui_Form(object):
         self.pos2z_2.setText(_translate("Form", "300"))
         self.pushButton.setText(_translate("Form", "SEND "))
         self.label_8.setText(_translate("Form", "YANTRA"))
-        self.label_9.setText(_translate("Form", "Path Point 2:"))
+        self.label_9.setText(_translate("Form", "Path Point 1:"))
         self.time1.setText(_translate("Form", "2"))
-        self.label_12.setText(_translate("Form", "Path Point 3:"))
+        self.label_12.setText(_translate("Form", "Path Point 2:"))
         self.time2.setText(_translate("Form", "4"))
-        self.label_13.setText(_translate("Form", "Path Point 4:"))
+        self.label_13.setText(_translate("Form", "Path Point 3:"))
         self.time3.setText(_translate("Form", "6"))
-        self.label_10.setText(_translate("Form", "Path Point 5:"))
+        self.label_10.setText(_translate("Form", "Path Point 4:"))
         self.time4.setText(_translate("Form", "8"))
-        self.label_11.setText(_translate("Form", "Path Point 6:"))
+        self.label_11.setText(_translate("Form", "Path Point 5:"))
         self.time5.setText(_translate("Form", "10"))
         self.label_24.setText(_translate("Form", "TIME :"))
         self.label_25.setText(_translate("Form", "* All values are in milimeter."))
-        self.label_26.setText(_translate("Form", "* All values are in seconds. Time for Path Point 1 is 0s."))
+        self.label_26.setText(_translate("Form", "* All values are in seconds. Time for Path Point 5 is ignored for now."))
         
     def send_button_pressed_callback(self):
         self.send_button_pressed = 1
@@ -456,7 +456,7 @@ class Ui_Form(object):
         p4 = Position()
         p4.pos = [float(self.pos1x_2.text()), float(self.pos1y_2.text()), float(self.pos2z_2.text())]
 
-        time = [0, float(self.time1.text()), float(self.time2.text()), float(self.time3.text()), float(self.time4.text()), float(self.time5.text())]
+        time = [float(self.time1.text()), float(self.time2.text()), float(self.time3.text()), float(self.time4.text())]
 
         resp = PathPointsGuiResponse()
         resp.pp = [p1, p2, p3, p4]
