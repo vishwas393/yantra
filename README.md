@@ -16,18 +16,36 @@ The project mainly consists of three nodes.
         *   Joint values (array of calculated joint position, velocity and accelaration for each joint)
 	<br/>
 
-3. **Trajectory Generator node**: This node performs the cubic polynomial joint trajectory. The equation for joint angles is as shown in the below given equation. The equation can also be understood from the image given below. The coefficient of the equation is then used to calculate the velocity. <br/>
-       q<sub>i,k</sub>(t) = a<sub>i,k,3</sub>t<sup>3</sup> + a<sub>i,k,2</sub>t<sup>2</sup> + a<sub>i,k,1</sub>t<sup>1</sup> + a<sub>i,k,0</sub> <br/>
-       - i : i<sup>th</sup> joint of the arm (total 5)
-       - k : k<sup>th</sup> path segment (total 5. 4 user-defined path-points and 2 virtual points for continuity upto acceleration).
+3. **Trajectory Generator node**: This node performs the cubic polynomial joint trajectory. The execution of the algorithm depends on the argument provided. The two option are `approach:=imposed_velocity` and `approach:=accel_continuity`. The equation for joint angles is as shown in the below given equation. This node returns the coefficient of the equation.  <br/>
+      ```math
+      q_{i,k}(t) = a_{i,k,0} + a_{i,k,1}t + a_{i,k,2}t^{2} + a_{i,k,3}t^{3}
+      ```
+      ```math
+      	i = i^{th} \text{ joint}
+      ```
+      ```math
+      	k = k^{th} \text{ path segment}
+      ```
+       
+	1. **Imposed Velocity**: This approach has a heuristic function which calculates the velocities of the intermidiate path-points. Here, User provides 4 path-points and hence, total 3 path-segment are generated. The start-point and end-point velocities are set to 0 by default. The velocities for rest of the points are calculated according to the below given function:
+        ```math
+            \displaylines{\dot{q}_{i,k} = \begin{cases}0 & if sgn(v_{i,k}) \neq sgn(v_{i,k+1})\\\frac{1}{2}(v_{i,k} + v_{i,k+1}) & if sgn(v_{i,k}) = sgn(v_{i,k+1})\end{cases}}
+	    ```
+	    ```math
+        
+		\displaylines{v_{i,k} = \frac{(q_{i,k} - q_{i,k-1})} {(t_{i,k} - t_{i,k-1})}}
+		\displaylines{k=1,...,N-1}
+        ```
+	
 
+	2. **Acceleration Continuity**: For this approach, two virtual path-points are added to the system and continuity upto accelaration is calculated. (not working yet)
+	
 ![Traj Eq](https://github.com/vishwas393/yantra/blob/controller_switching/misc/trajectory_image.png?raw=true "trajectory_equation")
 
-The output of the trajectory planner is visualised in MATLAB (matlab file in `misc` directory) and the whole application is visualised in the Gazebo. The output of MATLAB is attached below as well as a short GIF. Find the video of whole application [here].(not uploaded yet) 
-
-![MATLAB Plot](https://github.com/vishwas393/yantra/blob/controller_switching/misc/eepos_matlab_plot.jpg?raw=true "matlabplot")
+The output of the trajectory planner can also visualised in MATLAB (matlab file in `misc` directory) via providing trajectory coefficient which gets printed via ROS node in terminal. The whole application is visualised in the Gazebo. The output video as GIF is shown below. Find the video of whole application [here].(not uploaded yet) 
 
 ![Movement GIF](https://github.com/vishwas393/yantra/blob/controller_switching/misc/movement.gif?raw=true "movement_gif")
 
 [ROS controller]: http://wiki.ros.org/ros_control#Controllers
 [here]: www.youtube.com
+
