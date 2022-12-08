@@ -13,7 +13,7 @@
 	<rosparam command="load" file="$(find yantra)/config/yantra_controller.yaml"/>
 	<rosparam command="load" file="$(find yantra)/config/controller_groups.yaml"/>
 	
-
+	
 	<node name="yantra_arm_controller_spawner" pkg="controller_manager" type="spawner" 
 			ns="/yantra" args=  "yantra_arm_controller "/> 
 
@@ -22,7 +22,7 @@
 	
 
 	<node name="yantra_velocity_controller_spawner" pkg="controller_manager" type="spawner" 
-			ns="/yantra" args= " --stopped 
+			ns="/yantra" args= " --stopped
 			link_one_vel_controller	
 			link_two_vel_controller
 			link_three_vel_controller	
@@ -37,20 +37,14 @@
 			link_three_pos_controller	
 			link_four_pos_controller	
 			link_five_pos_controller"/--> 
-
-	<!--node name="rqt_plot" pkg="rqt_plot" type="rqt_plot"/>
-	<node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure"/-->
 	
+	<!--
+	<node name="rqt_plot" pkg="rqt_plot" type="rqt_plot"/>
+	<node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure"/>
+	-->
 
 </launch>
 
 
 
 
-
-	<!--param name="robot_description" command="$(find xacro)/xacro $(arg model)" />
-
-	<node if="$(arg gui)" name="joint_state_publisher" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" />
-	<node unless="$(arg gui)" name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
-	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
-	<node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" /-->

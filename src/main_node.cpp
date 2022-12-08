@@ -5,6 +5,7 @@
 #include "yantra/PathCoefficient_2d.h"
 #include "yantra/InverseKinematics.h"
 #include "yantra/TrajectoryGenerator.h"
+#include "yantra/PathPointsGui.h"
 #include "std_msgs/Float64MultiArray.h"
 #include "std_msgs/Float64.h"
 #include "std_msgs/String.h"
@@ -26,37 +27,49 @@ typedef std::vector<std::vector<std::vector<double>>> array3d;
 class Publish_Timer
 {
 	public:
-		Publish_Timer(ros::NodeHandle& _nh, array3d& _a, double _t)
+		Publish_Timer(ros::NodeHandle& _nh, array3d& _a, std::vector<double> _t)
 		{
 			coeff_a = _a;
-			end_time = _t - time_step;
+			time = _t;
+			time_len = time.size();
+			end_time = time.at(time_len -1) + time_step;
+			time_count = time.at(0) + time_step;
 
-			pub_joint1value = _nh.advertise<std_msgs::Float64>("/yantra/link_one_vel_controller/command", 1);
-			pub_joint2value = _nh.advertise<std_msgs::Float64>("/yantra/link_two_vel_controller/command", 1);
-			pub_joint3value = _nh.advertise<std_msgs::Float64>("/yantra/link_three_vel_controller/command", 1);
-			pub_joint4value = _nh.advertise<std_msgs::Float64>("/yantra/link_four_vel_controller/command", 1);
-			pub_joint5value = _nh.advertise<std_msgs::Float64>("/yantra/link_five_vel_controller/command", 1);
+			ROS_INFO_STREAM("end_time is : " << end_time);
+			pub_joint1value = _nh.advertise<std_msgs::Float64>("/yantra/link_one_vel_controller/command", 5);
+			pub_joint2value = _nh.advertise<std_msgs::Float64>("/yantra/link_two_vel_controller/command", 5);
+			pub_joint3value = _nh.advertise<std_msgs::Float64>("/yantra/link_three_vel_controller/command", 5);
+			pub_joint4value = _nh.advertise<std_msgs::Float64>("/yantra/link_four_vel_controller/command", 5);
+			pub_joint5value = _nh.advertise<std_msgs::Float64>("/yantra/link_five_vel_controller/command", 5);
 
 			std::cout << "Timer class instance created!" <<std::endl;
 		}
 
 		void callback(const ros::TimerEvent& event)
 		{
-			ROS_INFO_STREAM("end time is " << end_time << "  and time_count is " << time_count);
+			//ROS_INFO_STREAM("end time is " << end_time << "  and time_count is " << time_count);
 			
 			if((floorf(time_count*10)/10) == (floorf(end_time*10)/10))				// To comapre exactly one digit after decimal point 
 			{
 				stop();
 			}
 			else {
-				int path_seg = static_cast<int>(time_count) / 2;
-				ROS_INFO_STREAM("path_seg is: " << path_seg);
-				jvalpub.at(0) = (3*coeff_a[0][path_seg][0]*(std::pow(time_count,2)))+(2*coeff_a[0][path_seg][1]*time_count)+(coeff_a[0][path_seg][2]);
-				jvalpub.at(1) = (3*coeff_a[1][path_seg][0]*(std::pow(time_count,2)))+(2*coeff_a[1][path_seg][1]*time_count)+(coeff_a[1][path_seg][2]);
-				jvalpub.at(2) = (3*coeff_a[2][path_seg][0]*(std::pow(time_count,2)))+(2*coeff_a[2][path_seg][1]*time_count)+(coeff_a[2][path_seg][2]);
-				jvalpub.at(3) = (3*coeff_a[3][path_seg][0]*(std::pow(time_count,2)))+(2*coeff_a[3][path_seg][1]*time_count)+(coeff_a[3][path_seg][2]);
-				jvalpub.at(4) = (3*coeff_a[4][path_seg][0]*(std::pow(time_count,2)))+(2*coeff_a[4][path_seg][1]*time_count)+(coeff_a[4][path_seg][2]);
+				//path_seg = static_cast<int>(time_count) / 2;
 
+				idx_c = std::find(time.begin(), time.end(), static_cast<int>(time_count)) - time.begin();
+				if(idx_c != time_len && idx_c != time.size()-1) {
+					path_seg = idx_c;
+				}
+				
+				// Here coeff_a[..][..][a0 a1 a2 a3] --> a0 + a1*t + ...
+
+				ROS_INFO_STREAM("path_seg is: " << path_seg << "  time_count is: " << time_count);
+				jvalpub.at(0) = (3*coeff_a[0][path_seg][3]*(std::pow(time_count,2)))+(2*coeff_a[0][path_seg][2]*time_count)+(coeff_a[0][path_seg][1]);
+				jvalpub.at(1) = (3*coeff_a[1][path_seg][3]*(std::pow(time_count,2)))+(2*coeff_a[1][path_seg][2]*time_count)+(coeff_a[1][path_seg][1]);
+				jvalpub.at(2) = (3*coeff_a[2][path_seg][3]*(std::pow(time_count,2)))+(2*coeff_a[2][path_seg][2]*time_count)+(coeff_a[2][path_seg][1]);
+				jvalpub.at(3) = (3*coeff_a[3][path_seg][3]*(std::pow(time_count,2)))+(2*coeff_a[3][path_seg][2]*time_count)+(coeff_a[3][path_seg][1]);
+				jvalpub.at(4) = (3*coeff_a[4][path_seg][3]*(std::pow(time_count,2)))+(2*coeff_a[4][path_seg][2]*time_count)+(coeff_a[4][path_seg][1]);
+				ROS_INFO_STREAM(jvalpub.at(0) << " , " <<  jvalpub.at(1) << " , " <<  jvalpub.at(2) << " , " <<  jvalpub.at(3) << " , " << jvalpub.at(4) << " , ");
 				pub_1msg.data = jvalpub.at(0);
 				pub_2msg.data = jvalpub.at(1);
 				pub_3msg.data = jvalpub.at(2);
@@ -68,9 +81,14 @@ class Publish_Timer
 				pub_joint4value.publish(pub_4msg);
 				pub_joint5value.publish(pub_5msg);
 
-				ROS_INFO_STREAM("Point number: " << time_count);
+				//if (idx_c != idx_p && idx_c != time_len) {
+			//		path_seg++;
+			//	}
+
+				//ROS_INFO_STREAM("Point number: " << time_count);
 				time_count += time_step;
-				ROS_INFO_STREAM("time_count becomes" << time_count);
+				//idx_p = idx_c;
+				//ROS_INFO_STREAM("time_count becomes" << time_count);
 			}
 		}	
 
@@ -83,7 +101,8 @@ class Publish_Timer
 		void stop()
 		{
 			ROS_INFO_STREAM("Timer stops now");
-
+			timer.stop();
+			//ros::Duration(2*time_step).sleep();
 			pub_1msg.data = 0;
 			pub_2msg.data = 0;
 			pub_3msg.data = 0;
@@ -94,16 +113,19 @@ class Publish_Timer
 			pub_joint3value.publish(pub_3msg);
 			pub_joint4value.publish(pub_4msg);
 			pub_joint5value.publish(pub_5msg);
-			
-			timer.stop();
 		}
 
 	private:
-		double time_count = 0;
-		double time_step = 0.2;
+		double time_count = 2;
+		double time_step = 0.1;
+		double end_time = 0;
+		int time_len = 0;
+		int path_seg = 0;
+		int idx_c = 0; 
+		int idx_p = 0;
 		ros::Timer timer;
 		array3d coeff_a;
-		double end_time;
+		std::vector<double> time;
 		std::vector<double> jvalpub = std::vector<double>(5, 0);
 		
 		std_msgs::Float64 pub_1msg;
@@ -198,13 +220,14 @@ int trajectory_generator(ros::ServiceClient *cl, yantra::JointValues *q, std::ve
 
 
 	srv.request.T = time;
-
+	ROS_INFO("Calling Trajectory Server");
 	if(cl->call(srv))
 	{
+		ROS_INFO("trajectory_generator_server call successful");
 		for(int i=0; i<5; i++) {
 			std::cout << "Trajectory Coefficient for joint " << i << ":" << std::endl;
 			array2d tmp1;
-			for(int j=0; j<5; j++) {
+			for(int j=0; j<3; j++) {
 				std::vector<double> tmp;
 				for(int k=0; k<4; k++) {
 					std::cout << srv.response.a_qi[i].a_pi[j].a[k] << " | ";
@@ -227,6 +250,29 @@ int trajectory_generator(ros::ServiceClient *cl, yantra::JointValues *q, std::ve
 }
 
 
+int call_gui(ros::ServiceClient *cl, std::vector<double> &t, double (*pos)[4][3])
+{
+	yantra::PathPointsGui	srv;
+	srv.request.dummy = 0;
+
+	if(cl->call(srv))
+	{
+		ROS_INFO("GUI service successful!");
+		t = srv.response.pp_time;
+		for(int i=0; i<4; i++) {
+			(*pos)[i][0] = srv.response.pp.at(i).pos.at(0);
+			(*pos)[i][1] = srv.response.pp.at(i).pos.at(1);
+			(*pos)[i][2] = srv.response.pp.at(i).pos.at(2);
+		}
+	
+	}
+	else {
+		ROS_INFO("GUI service call failed!");
+		return -1;
+	}
+	return 0;
+}
+
 
 int main(int argc, char** argv)
 {
@@ -237,6 +283,7 @@ int main(int argc, char** argv)
 	ros::ServiceClient client_CC = node.serviceClient<controller_manager_msgs::SwitchController>("/yantra/controller_manager/switch_controller");	//CC = Controller change
 	ros::ServiceClient client_IK = node.serviceClient<yantra::InverseKinematics>("inverse_kinematics_server");	//IK = Inverse Kinematics
 	ros::ServiceClient client_TG = node.serviceClient<yantra::TrajectoryGenerator>("trajectory_generator_server");	//TG = Trajectory Generator
+	ros::ServiceClient client_PG = node.serviceClient<yantra::PathPointsGui>("/yantra_gui");	//PG = Path-points GUI
 	ros::Publisher pub_jointvalue = node.advertise<std_msgs::Float64MultiArray>("/yantra/yantra_arm_controller/command", 1);
 	
 	ros::Duration wait_time_server(15);
@@ -244,18 +291,27 @@ int main(int argc, char** argv)
 	client_IK.waitForExistence(wait_time_server);
 	client_TG.waitForExistence(wait_time_server);
 	client_CC.waitForExistence(wait_time_server);
-	
+	client_PG.waitForExistence(wait_time_server);
+
+	ROS_INFO("All services are online!");
 
 	controller_manager_msgs::SwitchController controller_change_srv;
 	std::vector<std::string> pos_controller	({"yantra_arm_controller"});
 	std::vector<std::string> vel_controller	({"link_one_vel_controller","link_two_vel_controller","link_three_vel_controller","link_four_vel_controller","link_five_vel_controller"}); 
 	
 
-	std::vector<double> time = {0.0, 2.0, 4.0, 6.0, 8.0,10.0};
+	double pos[4][3];			//4 = passing_points
+	std::vector<double> time;
+	int ret = call_gui(&client_PG, time, &pos);
+	
+	if(ret == -1) {
+			ROS_INFO("Could not get path points from GUI. Exiting!");
+			return -1;
+	}
 
 
 	double q_init[] = {0, 0, 0, 0, 0};
-	double pos[passing_points][3] = {{300, 0, 300} , {200, 200, 450}, {-100, 200, 500} , {-300, -100, 300}};
+	//double pos[passing_points][3] = {{300, 0, 300} , {200, 200, 450}, {-100, 200, 500} , {-300, -100, 300}};
 	double q_j_value[passing_points][5];
 	double q_j_velocity[passing_points][5] = {0};
 	double q_j_accel[passing_points][5] = {0};
@@ -264,6 +320,8 @@ int main(int argc, char** argv)
 	array3d coeff_a;
 
 	
+	
+
 
 	/*
 	 * Applying Inverse Kinematics to path points 
@@ -293,20 +351,19 @@ int main(int argc, char** argv)
 
 
 
-
 	/*
 	 * Commanding Arm to go the first path-point from where the velocity controller will start
 	 */
-	std::vector<double> home_pos(q_j_value[0], q_j_value[0]+sizeof(q_j_value[0])/sizeof(q_j_value[0][0]));
+	std::vector<double> home_pos1(q_j_value[0], q_j_value[0]+sizeof(q_j_value[0])/sizeof(q_j_value[0][0]));
 	std_msgs::Float64MultiArray home_pos_pub_msg;
-	home_pos_pub_msg.data = home_pos;
+	home_pos_pub_msg.data = home_pos1;
 	pub_jointvalue.publish(home_pos_pub_msg);
 	
 	char ans;
 	std::cout << "Is Home Position set?" << std::endl;
 	std::cin >> ans;
 
-
+	
 	/*
 	 * Generating Trajectory. Specifically calculating the path-segment coefficients
 	 */
@@ -358,7 +415,7 @@ int main(int argc, char** argv)
 	 * If successful, start the timer and publish the joint velocity as defined in timer callback function
 	 */
 	
-	Publish_Timer _timer(node, coeff_a, time.at(time.size()-1));
+	Publish_Timer _timer(node, coeff_a, time);
 	if (client_CC.call(controller_change_srv)) {
 			std::cout << "controller_change successful" << std::endl;
 

@@ -143,10 +143,10 @@ bool callback_fn(yantra::TrajectoryGenerator::Request &req, yantra::TrajectoryGe
 int main(int argc, char **argv)
 {
 	
-	ros::init(argc, argv, "trajectory_generator_server");
+	ros::init(argc, argv, "trajectory_cont_accel_generator_server");
 	ros::NodeHandle nh;
 
-	ros::ServiceServer traj_srvc = nh.advertiseService("trajectory_generator_server", callback_fn);
+	ros::ServiceServer traj_srvc = nh.advertiseService("trajectory_cont_accel_generator_server", callback_fn);
 	ROS_INFO("trajectory_generator_server Online!");
 	ros::spin();
 
