@@ -4,6 +4,20 @@
 
 This is a project based on the course "Advanced Robotic Kinematics and Dynamics" in masters program Robotic Systems Engineering at RWTH aachen university. 
 
+![Movement GIF](https://github.com/vishwas393/yantra/blob/controller_switching/misc/movement.gif?raw=true "movement_gif")
+
+
+ROS Version: Noetic
+Gazebo Version: 11.11.0
+
+To run the application, launch
+```sh
+roslaunch yantra yantra_launch.launch algo:=imposed_velocity
+```
+</br>
+A GUI will be launched where user must provide 4 path points and respective time (first time should be non-zero) for each point. User also need to confirm in newly opened terminal whether the home-position(1st point in GUI) is set in Gazebo.
+</br></br>
+
 The project mainly consists of three nodes.
 1. **Main node**: This is the main node the application. It first defines the path-points and initial joint positions, velocities and accelerations. It calls the **`service`**`inverse_kinematics_server` to calculate the joint values for given path-poinrs. After receiving the joint values, **`service`**`trajectory_generator_server` is called to generate the trajectory coefficient. At last, velocity for each joint is calculated using the trajecory coefficients and is published to [ROS controller] (*effort_controller/JointPositionGroupController* and *effort_controller/JointVelocityController*) <br/>
 
@@ -42,9 +56,8 @@ The project mainly consists of three nodes.
 	
 ![Traj Eq](https://github.com/vishwas393/yantra/blob/controller_switching/misc/trajectory_image.png?raw=true "trajectory_equation")
 
-The output of the trajectory planner can also visualised in MATLAB (matlab file in `misc` directory) via providing trajectory coefficient which gets printed via ROS node in terminal. The whole application is visualised in the Gazebo. The output video as GIF is shown below. Find the video of whole application [here].(not uploaded yet) 
+The output of the trajectory planner can also visualised in MATLAB (matlab files in `misc` directory) via providing trajectory coefficient which gets printed via ROS node in terminal. Find the video of whole application [here].(not uploaded yet) 
 
-![Movement GIF](https://github.com/vishwas393/yantra/blob/controller_switching/misc/movement.gif?raw=true "movement_gif")
 
 [ROS controller]: http://wiki.ros.org/ros_control#Controllers
 [here]: www.youtube.com

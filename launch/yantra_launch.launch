@@ -1,11 +1,22 @@
 <?xml version="1.0"?>
 <launch>
+	<arg name="algo" default="imposed_velocity"/>
 
 	<include file="$(find yantra)/launch/display.launch"/>	
+	
 	<node name="IK_server" pkg="yantra" type="inverse_kinematics_service.py"/>
-	<node name="trajectory_generator_server" pkg="yantra" type="trajectory_imposed_vel_generator_service.py"/>
-	<node name="GUI" pkg="yantra" type="yantra_gui.py"/>
+	
+	<group if="$(eval algo == 'imposed_velocity' )">
+		<node name="trajectory_generator_server" pkg="yantra" type="trajectory_imposed_vel_generator_service.py"/>
+		<node name="GUI" pkg="yantra" type="yantra_gui.py"/>
+	</group>
+
+	<group if="$(eval algo == 'accel_continuity')">
+		<node name="trajectory_generator_server" pkg="yantra" type="trajectory_cont_accel_generator_service"/>
+		<node name="GUI" pkg="yantra" type="yantra_gui_pp6.py"/>
+	</group>
 
 	<node name="main_node" pkg="yantra" type="main_node" output="screen" launch-prefix="gnome-terminal --command"/>
+
 </launch>
 

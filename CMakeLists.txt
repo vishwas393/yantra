@@ -186,6 +186,7 @@ catkin_install_python(PROGRAMS
   src/inverse_kinematics_service.py
   lib/yantra/predefined_matrices.py
   src/yantra_gui.py
+  src/yantra_gui_pp6.py
   src/trajectory_imposed_vel_generator_service.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

@@ -354,14 +354,17 @@ int main(int argc, char** argv)
 	/*
 	 * Commanding Arm to go the first path-point from where the velocity controller will start
 	 */
-	std::vector<double> home_pos1(q_j_value[0], q_j_value[0]+sizeof(q_j_value[0])/sizeof(q_j_value[0][0]));
-	std_msgs::Float64MultiArray home_pos_pub_msg;
-	home_pos_pub_msg.data = home_pos1;
-	pub_jointvalue.publish(home_pos_pub_msg);
-	
 	char ans;
-	std::cout << "Is Home Position set?" << std::endl;
-	std::cin >> ans;
+	do {
+		std::vector<double> home_pos1(q_j_value[0], q_j_value[0]+sizeof(q_j_value[0])/sizeof(q_j_value[0][0]));
+		std_msgs::Float64MultiArray home_pos_pub_msg;
+		home_pos_pub_msg.data = home_pos1;
+		pub_jointvalue.publish(home_pos_pub_msg);
+	
+		std::cout << "Is Home Position set?(y/n)" << std::endl;
+		std::cin >> ans;
+	}
+	while (ans != 'y');
 
 	
 	/*
