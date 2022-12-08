@@ -1,9 +1,10 @@
 <?xml version="1.0"?>
 <launch>
 
+	<include file="$(find yantra)/launch/display.launch"/>	
 	<node name="IK_server" pkg="yantra" type="inverse_kinematics_service.py"/>
 	<node name="trajectory_generator_server" pkg="yantra" type="trajectory_generator_service"/>
-	<include file="$(find yantra)/launch/display.launch"/>	
-	<!--node name="main_node" pkg="yantra" type="main_node"/-->
+	<node name="GUI" pkg="yantra" type="yantra_gui_pp6.py" />
+	<node name="main_node" pkg="yantra" type="main_node" output="screen" launch-prefix="gnome-terminal --command"/>
 </launch>
 

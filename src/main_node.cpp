@@ -5,6 +5,7 @@
 #include "yantra/PathCoefficient_2d.h"
 #include "yantra/InverseKinematics.h"
 #include "yantra/TrajectoryGenerator.h"
+#include "yantra/PathPointsGui.h"
 #include "std_msgs/Float64MultiArray.h"
 #include "std_msgs/Float64.h"
 #include "std_msgs/String.h"
@@ -26,10 +27,13 @@ typedef std::vector<std::vector<std::vector<double>>> array3d;
 class Publish_Timer
 {
 	public:
-		Publish_Timer(ros::NodeHandle& _nh, array3d& _a, double _t)
+		Publish_Timer(ros::NodeHandle& _nh, array3d& _a, std::vector<double> _t)
 		{
 			coeff_a = _a;
-			end_time = _t - time_step;
+			time = _t;
+			time_len = time.size();
+			end_time = time.at(time_len - 1) + time_step;
+			time_count = time.at(0); 
 
 			pub_joint1value = _nh.advertise<std_msgs::Float64>("/yantra/link_one_vel_controller/command", 1);
 			pub_joint2value = _nh.advertise<std_msgs::Float64>("/yantra/link_two_vel_controller/command", 1);
@@ -49,7 +53,12 @@ class Publish_Timer
 				stop();
 			}
 			else {
-				int path_seg = static_cast<int>(time_count) / 2;
+				
+				idx_c = std::find(time.begin(), time.end(), static_cast<int>(time_count)) - time.begin();
+				if(idx_c != time_len && idx_c != time.size()-1) {
+					path_seg = idx_c;
+				}
+				
 				ROS_INFO_STREAM("path_seg is: " << path_seg);
 				jvalpub.at(0) = (3*coeff_a[0][path_seg][0]*(std::pow(time_count,2)))+(2*coeff_a[0][path_seg][1]*time_count)+(coeff_a[0][path_seg][2]);
 				jvalpub.at(1) = (3*coeff_a[1][path_seg][0]*(std::pow(time_count,2)))+(2*coeff_a[1][path_seg][1]*time_count)+(coeff_a[1][path_seg][2]);
@@ -99,11 +108,15 @@ class Publish_Timer
 		}
 
 	private:
-		double time_count = 0;
+		double time_count = 2;
 		double time_step = 0.2;
+		double end_time = 0;
+		int time_len = 0;
+		int path_seg = 0;
+		int idx_c = 0;
 		ros::Timer timer;
 		array3d coeff_a;
-		double end_time;
+		std::vector<double> time;
 		std::vector<double> jvalpub = std::vector<double>(5, 0);
 		
 		std_msgs::Float64 pub_1msg;
@@ -228,6 +241,36 @@ int trajectory_generator(ros::ServiceClient *cl, yantra::JointValues *q, std::ve
 
 
 
+
+int call_gui(ros::ServiceClient *cl, std::vector<double> &t, double (*pos)[4][3])
+{
+	yantra::PathPointsGui	srv;
+	srv.request.dummy = 0;
+
+	if(cl->call(srv))
+	{
+		ROS_INFO("GUI service successful!");
+		t = srv.response.pp_time;
+		for(int i=0; i<4; i++) {
+			(*pos)[i][0] = srv.response.pp.at(i).pos.at(0);
+			(*pos)[i][1] = srv.response.pp.at(i).pos.at(1);
+			(*pos)[i][2] = srv.response.pp.at(i).pos.at(2);
+		}
+	
+	}
+	else {
+		ROS_INFO("GUI service call failed!");
+		return -1;
+	}
+	return 0;
+}
+
+
+
+
+
+
+
 int main(int argc, char** argv)
 {
 	ros::init(argc, argv, "main_node");
@@ -237,6 +280,7 @@ int main(int argc, char** argv)
 	ros::ServiceClient client_CC = node.serviceClient<controller_manager_msgs::SwitchController>("/yantra/controller_manager/switch_controller");	//CC = Controller change
 	ros::ServiceClient client_IK = node.serviceClient<yantra::InverseKinematics>("inverse_kinematics_server");	//IK = Inverse Kinematics
 	ros::ServiceClient client_TG = node.serviceClient<yantra::TrajectoryGenerator>("trajectory_generator_server");	//TG = Trajectory Generator
+	ros::ServiceClient client_PG = node.serviceClient<yantra::PathPointsGui>("/yantra_gui");	//PG = Path-points GUI
 	ros::Publisher pub_jointvalue = node.advertise<std_msgs::Float64MultiArray>("/yantra/yantra_arm_controller/command", 1);
 	
 	ros::Duration wait_time_server(15);
@@ -250,12 +294,18 @@ int main(int argc, char** argv)
 	std::vector<std::string> pos_controller	({"yantra_arm_controller"});
 	std::vector<std::string> vel_controller	({"link_one_vel_controller","link_two_vel_controller","link_three_vel_controller","link_four_vel_controller","link_five_vel_controller"}); 
 	
+	
+	double pos[4][3];			//4 = passing_points
+	std::vector<double> time;
+	int ret = call_gui(&client_PG, time, &pos);	
+	if(ret == -1) {
+			ROS_INFO("Could not get path points from GUI. Exiting!");
+			return -1;
+	}
 
-	std::vector<double> time = {0.0, 2.0, 4.0, 6.0, 8.0,10.0};
 
 
 	double q_init[] = {0, 0, 0, 0, 0};
-	double pos[passing_points][3] = {{300, 0, 300} , {200, 200, 450}, {-100, 200, 500} , {-300, -100, 300}};
 	double q_j_value[passing_points][5];
 	double q_j_velocity[passing_points][5] = {0};
 	double q_j_accel[passing_points][5] = {0};
@@ -358,7 +408,7 @@ int main(int argc, char** argv)
 	 * If successful, start the timer and publish the joint velocity as defined in timer callback function
 	 */
 	
-	Publish_Timer _timer(node, coeff_a, time.at(time.size()-1));
+	Publish_Timer _timer(node, coeff_a, time);
 	if (client_CC.call(controller_change_srv)) {
 			std::cout << "controller_change successful" << std::endl;
 

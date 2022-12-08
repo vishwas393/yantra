@@ -64,6 +64,7 @@ add_service_files(
   FILES
   InverseKinematics.srv
   TrajectoryGenerator.srv
+  PathPointsGui.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -183,6 +184,7 @@ target_link_libraries(pid_param_mapping ${catkin_LIBRARIES})
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
   src/inverse_kinematics_service.py
+  src/yantra_gui_pp6.py
   lib/yantra/predefined_matrices.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
