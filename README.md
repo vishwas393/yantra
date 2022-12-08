@@ -41,7 +41,7 @@ The project mainly consists of three nodes.
       	k = k^{th} \text{ path segment}
       ```
        
-	1. **Imposed Velocity**: This approach has a heuristic function which calculates the velocities of the intermidiate path-points. Here, User provides 4 path-points and hence, total 3 path-segment are generated. The start-point and end-point velocities are set to 0 by default. The velocities for rest of the points are calculated according to the below given function:
+	1. **Imposed Velocity**: This approach has a heuristic function which calculates the velocities of the intermidiate path-points. Here, User provides 4 path-points and hence, total 3 path-segment are generated. The start-point and end-point velocities are set to 0 by default. The velocities for rest of the points are calculated according to the below given function. The trajectory will not be intuitive because there is no orienttation defined for end-position as well as this is a joint space trajectory planner which focuses on path-points rather than path itself. 
         ```math
             \displaylines{\dot{q}_{i,k} = \begin{cases}0 & if sgn(v_{i,k}) \neq sgn(v_{i,k+1})\\\frac{1}{2}(v_{i,k} + v_{i,k+1}) & if sgn(v_{i,k}) = sgn(v_{i,k+1})\end{cases}}
 	    ```
@@ -52,7 +52,7 @@ The project mainly consists of three nodes.
         ```
 	
 
-	2. **Acceleration Continuity**: For this approach, two virtual path-points are added to the system and continuity upto accelaration is calculated. (not working yet)
+	2. **Acceleration Continuity**: For this approach, two virtual path-points are added to the system and continuity upto accelaration is calculated. (implemented but not yet working)
 	
 ![Traj Eq](https://github.com/vishwas393/yantra/blob/controller_switching/misc/trajectory_image.png?raw=true "trajectory_equation")
 
