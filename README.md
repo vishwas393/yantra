@@ -7,7 +7,7 @@ This is a project based on the course "Advanced Robotic Kinematics and Dynamics"
 ![Movement GIF](https://github.com/vishwas393/yantra/blob/controller_switching/misc/movement.gif?raw=true "movement_gif")
 
 
-ROS Version: Noetic
+ROS Version: Noetic </br>
 Gazebo Version: 11.11.0
 
 To run the application, launch
