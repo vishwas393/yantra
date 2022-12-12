@@ -56,9 +56,8 @@ The project mainly consists of three nodes.
 	
 ![Traj Eq](https://github.com/vishwas393/yantra/blob/controller_switching/misc/trajectory_image.png?raw=true "trajectory_equation")
 
-The output of the trajectory planner can also visualised in MATLAB (matlab files in `misc` directory) via providing trajectory coefficient which gets printed via ROS node in terminal. Find the video of whole application [here].(not uploaded yet) 
-
+The output of the trajectory planner can also visualised in MATLAB (matlab files in `misc` directory) via providing trajectory coefficient which gets printed via ROS node in terminal. Find the video of whole application [here].
 
 [ROS controller]: http://wiki.ros.org/ros_control#Controllers
-[here]: www.youtube.com
+[here]: https://youtu.be/qAU0fLBAawA
 
